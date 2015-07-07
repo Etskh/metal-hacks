@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+	<meta title="Metal RPG" package="com.sample.metalhacks" version="0.0.2" company="Filthy Humans Studio" />
+	<app main="Main" path="Export" file="MetalHacks" />
+
+
+	<window width="320" height="240" background="#FFFFFF" fps="30" />
+	<window hardware="true" allow-shaders="true" require-shaders="true" depth-buffer="false" stencil-buffer="false" />
+	<window fullscreen="false" resizable="true" borderless="false" vsync="false" />
+
+	<source path="Source" />
+
+	<haxelib name="openfl" />
+	<haxelib name="actuate" />
+
+	<assets path="Assets" rename="assets" exclude="openfl.svg" />
+	<icon path="Assets/openfl.svg" />
+
+</project>
