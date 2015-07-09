@@ -214,12 +214,12 @@ class SpoilsState implements SimulationState
 		this.sim = sim;
 
 		infoScreen = new GUI.FramedWidget(sim.stage);
-		infoScreen.resize(256,256);
-		infoScreen.slideTo(-256,0);
+		infoScreen.resize( 256, 256 );
+		infoScreen.slideTo( new Point(-256,0) );
 	}
 
 	public function init () {
-		infoScreen.slideTo(0,0);
+		infoScreen.slideTo( new Point( (sim.stage.width/2) + 128, 0), 2);
 	}
 
 	public function update () : Bool {
