@@ -127,6 +127,14 @@ class BandMember extends Character
 		this.stats.set("energy-max", 0.0 );
 		this.stats.set("energy-per-second", 1.0 );
 	}
+
+	public function createWorldAvatar( enviro:World.Environment ) {
+
+		// Do init stuff, like assigning equipment and hair and stuff
+		//
+
+		return new World.BandMemberWorldAvatar( enviro );
+	}
 }
 
 
@@ -231,5 +239,3 @@ class AbilityEffectImpress implements AbilityEffect
 		Debug.log("AbilityEffects", caster.name+" impresses "+ targets[0].name+" for "+ (val* success) );
 	}
 }
-
-

@@ -8,99 +8,10 @@ import openfl.geom.Point; // Camera
 import motion.easing.Sine; // Dude
 import motion.Actuate;
 
-import Debug;
-import Character;
-import Environment;
+import openfl.display.Tilesheet;
+import openfl.Assets;
+import openfl.geom.Rectangle;
 
-
-class Entity extends Sprite
-{
-	public var pos:Point;
-
-	public function new ( parent:Sprite ) {
-		super();
-
-		parent.addChild( this );
-
-		this.pos = new Point(0,0);
-	}
-
-	// TODO: Add a callback to this funciton
-	public function move ( pos:Point, time:Float=0 ) {
-		var callback = false;
-		var tween = Actuate.tween( this, time, { x:pos.x, y:pos.y } ).ease(Sine.easeInOut);
-
-		if( callback ) {
-			tween.onComplete( callback );
-		}
-	}
-
-	// TODO: Add a callback to this function
-	public function walk ( pos:Point, speed:Float=128 ) {
-		var distance = Point.distance( pos, this.pos );
-		move( pos, distance / speed );
-	}
-
-	public function update () {
-		// empty
-	}
-}
-
-
-class Avatar extends Entity
-{
-	public function new ( parent:Sprite ) {
-		super();
-
-		this.graphics.beginFill(0x222222 );
-		this.graphics.drawRect(0,0,32,32);
-
-		addEventListener (Event.ENTER_FRAME, onUpdate );
-		addEventListener( MouseEvent.CLICK, onActivate );
-	}
-
-	public function onUpdate( e:Dynamic ) {
-		super.update();
-	}
-
-	public function onActivate( e:Dynamic ) {
-		walk(new Point(0, 128), 128 );
-	}
-}
-
-
-
-class BandMemberWorldAvatar extends Avatar
-{
-
-	public function new ( parent:Sprite ) {
-		super(parent);
-
-		addEventListener (Event.ENTER_FRAME, onUpdate );
-		addEventListener( MouseEvent.CLICK, onActivate );
-	}
-
-	public function onUpdate( e:Dynamic ) {
-		super.update();
-	}
-
-	public function onActivate( e:Dynamic ) {
-		Debug.log("Opening character info tab");
-	}
-
-	public function done() {
-		trace("Done!");
-	}
-
-}
-
-
-
-
-class Camera extends Entity
-{
-
-}
 
 
 
@@ -119,16 +30,13 @@ interface SimulationState
 class Simulation
 {
 	// Party characters
-	public var band:Array<BandMember>;
+	public var band:Array<Character.BandMember>;
 
 	// Environment
-	public var enviro:Environment;
+	public var enviro:World.Environment;
 
 	// Stage
 	public var stage:Sprite;
-
-	// Camera
-	public var camera:Camera;
 
 	// Current state logic
 	var state:SimulationState;
@@ -141,11 +49,9 @@ class Simulation
 
 		this.band = new Array<Character.BandMember>();
 
-		this.enviro = new Environment.Environment( stage );
+		this.enviro = new World.Environment( stage );
 
 		this.stage = stage;
-
-		this.camera = new Camera();
 
 		this.state = new LoadState(this);
 		this.nextState = null;
@@ -190,18 +96,17 @@ class LoadState implements SimulationState
 	}
 
 	public function init () {
-		Ability.loadAll();
+		Character.Ability.loadAll();
 	}
 
 	public function update () : Bool {
 
-		var askr = new BandMember("Askr");
-		askr.abilities = new Array<Ability>();
-		askr.abilities.push(Ability.getByName("Groovy Lick"));
+		var askr = new Character.BandMember("Askr");
+		askr.abilities = new Array<Character.Ability>();
+		askr.abilities.push(Character.Ability.getByName("Groovy Lick"));
         this.sim.band.push(askr);
 
-		// Test
-		var dude = new Dude( this.sim.stage );
+		askr.createWorldAvatar( this.sim.enviro );
 
 		sim.changeState( new BattleState(this.sim) );
 		return true;
@@ -228,12 +133,13 @@ class BattleState implements SimulationState
 	var sim:Simulation;
 	var crowd:Array<Character.CrowdCharacter>;
 	var stats:Character.StatBlock;
+	var infoScreen:GUI.Widget;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
 		this.crowd = new Array<Character.CrowdCharacter>();
 
-		this.stats = new StatBlock();
+		this.stats = new Character.StatBlock();
 		this.stats.set("crowd-impressed", 0 );
 		this.stats.set("coin-won", 0 );
 	}
@@ -256,6 +162,9 @@ class BattleState implements SimulationState
 		crowdMember.stats.set("impress-max", 70);
 		crowd.push( crowdMember );
 
+		infoScreen = new GUI.FramedWidget( sim.stage );
+		infoScreen.slideTo( new Point(0,0) );
+		infoScreen.resize( 64, 64 );
 	}
 
 	public function update () : Bool {
@@ -275,9 +184,45 @@ class BattleState implements SimulationState
 		}
 		if( areAllImpressed ) {
 			Debug.log("State", "Everyone is impressed!");
-			return false;
+			this.sim.changeState( new SpoilsState(this.sim) );
 		}
 
+		return true;
+	}
+
+	public function exit () {
+		infoScreen.slideTo( new Point( -1 * infoScreen.desiredSize.x ,0), 2.0 );
+	}
+
+	public function name () {
+		return "BattleState";
+	}
+
+
+}
+
+
+
+
+
+class SpoilsState implements SimulationState
+{
+	var sim:Simulation;
+	var infoScreen:GUI.Widget;
+
+	public function new (sim:Simulation) {
+		this.sim = sim;
+
+		infoScreen = new GUI.FramedWidget(sim.stage);
+		infoScreen.resize(256,256);
+		infoScreen.slideTo(-256,0);
+	}
+
+	public function init () {
+		infoScreen.slideTo(0,0);
+	}
+
+	public function update () : Bool {
 		return true;
 	}
 
@@ -286,8 +231,6 @@ class BattleState implements SimulationState
 	}
 
 	public function name () {
-		return "BattleState";
+		return "SpoilsState";
 	}
-
-
 }
