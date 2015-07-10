@@ -52,6 +52,60 @@ class Widget extends Sprite
 	}
 }
 
+
+
+
+/*
+
+
+class Skin
+{
+	var tilesheet:Tilesheet = null;
+	var SIZE = 16.0;
+	var frames:Array< Array<Float>>;
+
+	public function new ( assetPath:String, size:Float ) {
+		this.SIZE = size;
+		this.tilesheet = new Tilesheet( Assets.getBitmapData(assetPath));
+		this.frames = new Array<Array<Float>>();
+	}
+
+	public function addFrame ( xIndexTL:Int, yIndexTL:Int ) : Int {
+		var frame = new Array<Float>();
+
+		frame = frame.concat([
+			// Top-left
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
+			// Top-center
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+1)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
+			// Top-right
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+2)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
+
+			// Middle-left
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+1)*SIZE, SIZE, SIZE )),
+			// Repeat (Middle-center)
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+1)*SIZE, (yIndexTL+1)*SIZE, SIZE, SIZE )),
+			// Middle-right
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+2)*SIZE, (yIndexTL+1)*SIZE, SIZE, SIZE )),
+
+			// Bottom-left
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
+			// Bottom-center
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+1)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
+			// Bottom-right
+			tilesheet.addTileRect( new Rectangle( (xIndexTL+2)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
+		]);
+
+	}
+
+	public function drawFrame( frameID:Int, w:Float, h:Float, graphics:Graphics, ) {
+
+	}
+
+}*/
+
+
+
 // Does a frame, and can have children
 //
 // TODO: this would be better suited for a CRTP
@@ -89,12 +143,11 @@ class FramedWidget extends Widget
 	}
 
 
-	override public function draw() {
+	override public function draw( /*w:Float, h:Float , graphics:Graphics*/ ) {
 
 		// Get the closest size of the thing to the multiples of 16
 		var scale = new Point(1,1);
 		var tiles = new Array<Float>();
-
 
 		//var how many inside
 		var cols:Int = Std.int ( desiredSize.x / SIZE );
