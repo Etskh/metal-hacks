@@ -17,6 +17,19 @@ import openfl.geom.Rectangle;
 
 
 
+
+
+interface GUI
+{
+	public function windowFrameID	() : Int ;
+	public function buttonFrameID	() : Int ;
+}
+
+
+
+
+
+
 // Does animating, placement, and flow
 //
 class Widget extends Sprite
@@ -55,11 +68,13 @@ class Widget extends Sprite
 
 
 
-/*
+
 
 
 class Skin
 {
+	static var defaultSkin:GUISkin;
+	var name:String="default";
 	var tilesheet:Tilesheet = null;
 	var SIZE = 16.0;
 	var frames:Array< Array<Float>>;
@@ -68,12 +83,15 @@ class Skin
 		this.SIZE = size;
 		this.tilesheet = new Tilesheet( Assets.getBitmapData(assetPath));
 		this.frames = new Array<Array<Float>>();
+
+		if( skins == null) {
+			skins = new Array<Skin>();
+		}
+		skins.push( this );
 	}
 
 	public function addFrame ( xIndexTL:Int, yIndexTL:Int ) : Int {
-		var frame = new Array<Float>();
-
-		frame = frame.concat([
+		var frame:Array<Float> = [
 			// Top-left
 			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
 			// Top-center
@@ -94,18 +112,104 @@ class Skin
 			tilesheet.addTileRect( new Rectangle( (xIndexTL+1)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
 			// Bottom-right
 			tilesheet.addTileRect( new Rectangle( (xIndexTL+2)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
+		];
+
+		return this.frames.push( frame );
+	}
+
+
+	public function drawFrame( frameID:Int, w:Float, h:Float, graphics:Graphics ) {
+		var tiles = new Array<Float>();
+
+		var cols:Int = Std.int ( desiredSize.x / SIZE );
+		var rows:Int = Std.int ( desiredSize.y / SIZE );
+
+		// Add the four corners
+		tiles = tiles.concat([
+			0,				0,				frames[frameID][0],
+			(cols-1)*SIZE,	0,				frames[frameID][2],
+			0,				(rows-1)*SIZE,	frames[frameID][6],
+			(cols-1)*SIZE,	(rows-1)*SIZE,	frames[frameID][8],
 		]);
 
+
+		// Add the top and bottom
+		for( x in 1...cols-1 ) {
+			tiles = tiles.concat([
+				x*SIZE,		0,				frames[frameID][1],
+				x*SIZE,		(rows-1)*SIZE,	frames[frameID][7]
+			]);
+		}
+
+		// Add the left and right
+		for( y in 1...rows-1 ) {
+			tiles = tiles.concat([
+				0,				y*SIZE,		frames[frameID][3],
+				(cols-1)*SIZE,	y*SIZE,		frames[frameID][5]
+			]);
+		}
+
+		// Add all the centre tiles
+		for( x in 1...cols-1 ) {
+			for( y in 1...rows-1 ) {
+				tiles = tiles.concat([x*SIZE, y*SIZE, frames[frameID][4] ]);
+			}
+		}
+
+		// Draw them all!
+		graphics.clear();
+		tilesheet.drawTiles( this.graphics, tiles, false );
 	}
 
-	public function drawFrame( frameID:Int, w:Float, h:Float, graphics:Graphics, ) {
+	static public function getDefault() {
+		//
+		// no skins have been made
+		//
+		if ( defaultSkin == null ) {
+			defaultSkin = new GUISkin( "assets/gui/gui-test.png", 16.0 );
+		}
+		return defaultSkin;
+	}
+}
 
+
+class GUISkin extends Skin implements GUI
+{
+	var basicButtonID:Int;
+	var basicWindowID:Int;
+
+	public function new() {
+		super("assets/gui/gui-test.png", 16.0);
+
+		basicButtonID = addFrame( 0, 0 );
+		basicWindowID = addFrame( 3, 0 );
 	}
 
-}*/
+	public function buttonFrameID	() : Int {
+		return basicButtonID;
+	}
+	public function windowFrameID	() : Int {
+		return basicWindowID;
+	}
+}
 
 
 
+class Button extends Widget
+{
+	public function new( text:String, parent:Widget=null, skin:GUISkin = Skin.getDefault() ) {
+		super(parent);
+		this.desiredSize = new Point(128,64);
+		skin.drawFrame( skin.buttonFrameID(), desiredSize.x, desiredSize.y, this.graphics );
+	}
+
+	public function onClick( callback:Void -> Void ) {
+		// empty
+	}
+}
+
+
+/*
 // Does a frame, and can have children
 //
 // TODO: this would be better suited for a CRTP
@@ -143,7 +247,7 @@ class FramedWidget extends Widget
 	}
 
 
-	override public function draw( /*w:Float, h:Float , graphics:Graphics*/ ) {
+	override public function draw() {
 
 		// Get the closest size of the thing to the multiples of 16
 		var scale = new Point(1,1);
@@ -190,7 +294,7 @@ class FramedWidget extends Widget
 		graphics.clear();
 		tilesheet.drawTiles( this.graphics, tiles, false );
 	}
-}
+}*/
 
 
 

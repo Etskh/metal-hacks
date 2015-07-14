@@ -106,9 +106,9 @@ class LoadState implements SimulationState
 		askr.abilities.push(Character.Ability.getByName("Groovy Lick"));
         this.sim.band.push(askr);
 
-		askr.createWorldAvatar( this.sim.enviro );
+		//askr.createWorldAvatar( this.sim.enviro );
 
-		sim.changeState( new BattleState(this.sim) );
+		sim.changeState( new WorldState(this.sim) );
 		return true;
 	}
 
@@ -121,6 +121,42 @@ class LoadState implements SimulationState
 	}
 }
 
+
+
+
+
+
+class WorldState implements SimulationState
+{
+	var sim:Simulation;
+	var battleButton:GUI.Widget;
+
+	public function new (sim:Simulation) {
+		this.sim = sim;
+	}
+
+	public function init () {
+		battleButton = new GUI.Button("Battle!", sim.stage );
+		battleButton.onClick( onBattleButton );
+	}
+
+	public function update () : Bool {
+		// empty
+	}
+
+	public function exit () {
+		// empty
+	}
+
+	public function name () {
+		return "WorldState";
+	}
+
+	public function onBattleButton() {
+
+	}
+
+}
 
 
 

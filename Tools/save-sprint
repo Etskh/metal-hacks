@@ -1,0 +1,16 @@
+#!/usr/bin/python
+
+import os
+import string
+
+sprintFiles = os.listdir("Sprints")
+
+highest = 0;
+for f in sprintFiles:
+	highest= max(highest, int( string.lstrip(f,'sprint').rstrip('.txz')))
+
+newFile = "sprint{}.txz".format(highest+1)
+
+os.system("tar --xz -cf {} Source/".format(newFile))
+os.system("mv {} Sprints/".format(newFile))
+print( 'Saved sprint #{}'.format(highest+1) )
