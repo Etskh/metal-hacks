@@ -105,22 +105,31 @@ class Camera extends Entity
 class Environment extends Sprite
 {
 	var tilesheet:Tilesheet;
+	var size:Int;
+	var tiles:Array<Float>;
 
 	public function new ( stage:Sprite ) {
 		super();
 
-		tilesheet = new Tilesheet( Assets.getBitmapData("assets/environment/environment-test.png"));
+		var data:openfl.display.BitmapData = Assets.getBitmapData("assets/environment/environment-lobby.png");
+		this.size = 32;
+		this.tilesheet = new Tilesheet(data);
+		this.tiles = new Array<Float>();
+		var drawList = new Array<Float>();
 
-		for( cols in 0...16 ) {
-			for( rows in 0...16 ) {
-				tilesheet.addTileRect( new Rectangle( cols*32, rows*32, 32, 32 ));
+		var cols:Int = cast ( data.width / size );
+		var rows:Int = cast ( data.height / size );
+
+		for( x in 0...cols) {
+			for( y in 0...rows ) {
+				this.tiles.push( tilesheet.addTileRect( new Rectangle( x*size, y*size, size, size )));
 			}
 		}
 
 		var drawList= new Array<Float>();
-		for( cols in 0...16 ) {
-			for( rows in 0...16 ) {
-				drawList = drawList.concat([ cols*32, rows*32, Std.random(16*16) ]);
+		for( x in 0...16 ) {
+			for( y in 0...16 ) {
+				drawList = drawList.concat([ x*size, y*size, Std.random(tiles.length) ]);
 			}
 		}
 		tilesheet.drawTiles( graphics, drawList, true);

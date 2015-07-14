@@ -7,7 +7,8 @@ sprintFiles = os.listdir("Sprints")
 
 highest = 0;
 for f in sprintFiles:
-	highest= max(highest, int( string.lstrip(f,'sprint').rstrip('.txz')))
+	if ( "txz" in f ):
+		highest= max(highest, int( string.lstrip(f,'sprint').rstrip('.txz')))
 
 newFile = "sprint{}.txz".format(highest+1)
 

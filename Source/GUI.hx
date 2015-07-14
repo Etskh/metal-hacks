@@ -32,22 +32,37 @@ interface GUI
 
 // Does animating, placement, and flow
 //
+typedef WidgetCallback = Dynamic -> Void;
+
 class Widget extends Sprite
 {
 	//public var pos:Point;
 	public var desiredSize:Point;
+	var hitbox:Sprite;
+	var innerLip:Float;
+	var callbacks:Map <String, Array<WidgetCallback> >;
 
 	public function new (parent:Sprite) {
 		super();
 		parent.addChild(this);
 
-		//this.pos = new Point(0,0);
-		this.desiredSize = new Point(64,64);
+		innerLip = 12;
+		this.resize( 64, 64);
+
+		this.callbacks = new Map <String, Array<WidgetCallback> >();
+
+		this.hitbox = new Sprite();
+		addChild( hitbox );
+		hitbox.addEventListener( MouseEvent.CLICK, _onClick );
 	}
 
 	public function resize( x:Float, y:Float ) {
 		this.desiredSize = new Point(x,y);
 		draw();
+
+		this.hitbox.graphics.clear();
+		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.2 );
+		this.hitbox.graphics.drawRect( innerLip, innerLip, x-innerLip*2, y-innerLip*2 );
 	}
 
 	public function draw() {
@@ -63,6 +78,30 @@ class Widget extends Sprite
 			tween.onComplete( callback );
 		}
 	}
+
+
+	public function onClick( callback:WidgetCallback ) {
+		addCallback("click", callback );
+	}
+
+	public function addCallback( event:String, callback:WidgetCallback ) {
+		var callbackList = this.callbacks.get(event);
+		if( callbackList == null ) {
+			callbackList = new Array<WidgetCallback>();
+			this.callbacks.set( event, callbackList );
+		}
+		callbackList.push( callback );
+	}
+
+	private function _onClick ( e:Dynamic ) {
+		var callbackList = this.callbacks.get("click");
+		if( callbackList == null ) {
+			return;
+		}
+		for( c in 0...callbackList.length ) {
+			c(e);
+		}
+	}
 }
 
 
@@ -73,21 +112,17 @@ class Widget extends Sprite
 
 class Skin
 {
-	static var defaultSkin:GUISkin;
+	static var defaultSkin:GUISkin = null;
 	var name:String="default";
 	var tilesheet:Tilesheet = null;
 	var SIZE = 16.0;
 	var frames:Array< Array<Float>>;
 
+
 	public function new ( assetPath:String, size:Float ) {
 		this.SIZE = size;
 		this.tilesheet = new Tilesheet( Assets.getBitmapData(assetPath));
 		this.frames = new Array<Array<Float>>();
-
-		if( skins == null) {
-			skins = new Array<Skin>();
-		}
-		skins.push( this );
 	}
 
 	public function addFrame ( xIndexTL:Int, yIndexTL:Int ) : Int {
@@ -118,11 +153,11 @@ class Skin
 	}
 
 
-	public function drawFrame( frameID:Int, w:Float, h:Float, graphics:Graphics ) {
+	public function drawFrame( frameID:Int, w:Float, h:Float, graphics:openfl.display.Graphics ) {
 		var tiles = new Array<Float>();
 
-		var cols:Int = Std.int ( desiredSize.x / SIZE );
-		var rows:Int = Std.int ( desiredSize.y / SIZE );
+		var cols:Int = Std.int ( w / SIZE );
+		var rows:Int = Std.int ( h / SIZE );
 
 		// Add the four corners
 		tiles = tiles.concat([
@@ -158,7 +193,7 @@ class Skin
 
 		// Draw them all!
 		graphics.clear();
-		tilesheet.drawTiles( this.graphics, tiles, false );
+		tilesheet.drawTiles( graphics, tiles, false );
 	}
 
 	static public function getDefault() {
@@ -166,7 +201,7 @@ class Skin
 		// no skins have been made
 		//
 		if ( defaultSkin == null ) {
-			defaultSkin = new GUISkin( "assets/gui/gui-test.png", 16.0 );
+			defaultSkin = new GUISkin();
 		}
 		return defaultSkin;
 	}
@@ -178,7 +213,7 @@ class GUISkin extends Skin implements GUI
 	var basicButtonID:Int;
 	var basicWindowID:Int;
 
-	public function new() {
+	public function new( ) {
 		super("assets/gui/gui-test.png", 16.0);
 
 		basicButtonID = addFrame( 0, 0 );
@@ -197,14 +232,15 @@ class GUISkin extends Skin implements GUI
 
 class Button extends Widget
 {
-	public function new( text:String, parent:Widget=null, skin:GUISkin = Skin.getDefault() ) {
-		super(parent);
-		this.desiredSize = new Point(128,64);
-		skin.drawFrame( skin.buttonFrameID(), desiredSize.x, desiredSize.y, this.graphics );
-	}
+	public var skin:GUISkin;
 
-	public function onClick( callback:Void -> Void ) {
-		// empty
+	public function new( text:String, parent:Sprite=null ) {
+		super(parent);
+
+		this.skin = Skin.getDefault();
+		this.resize(128,64);
+
+		skin.drawFrame( skin.buttonFrameID(), desiredSize.x, desiredSize.y, this.graphics );
 	}
 }
 

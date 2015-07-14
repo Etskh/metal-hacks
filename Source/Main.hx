@@ -30,7 +30,7 @@ class Main extends Sprite {
 
     	// Start-up blurb
     	//
-    	Debug.log("System", "Week3 Development Branch - " + Sys.time());
+    	Debug.log("System", "Week 3 Development Branch - " + Sys.time());
     	Debug.log("System", "debug "+ Sys.systemName() );
 
         var simulation = new Simulation(background);
