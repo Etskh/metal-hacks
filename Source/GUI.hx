@@ -3,7 +3,6 @@ package;
 
 
 
-import flash.events.Event;
 import openfl.events.MouseEvent;
 
 
@@ -46,14 +45,19 @@ class Widget extends Sprite
 		super();
 		parent.addChild(this);
 
-		innerLip = 12;
-		this.resize( 64, 64);
-
+		// Create the event callbacks
 		this.callbacks = new Map <String, Array<WidgetCallback> >();
 
+		// Creating the hitbox
 		this.hitbox = new Sprite();
 		addChild( hitbox );
+
+		// Adding event listeneres
 		hitbox.addEventListener( MouseEvent.CLICK, _onClick );
+
+		// Resize all the sprites
+		innerLip = 12;
+		this.resize( 64, 64);
 	}
 
 	public function resize( x:Float, y:Float ) {
@@ -93,13 +97,17 @@ class Widget extends Sprite
 		callbackList.push( callback );
 	}
 
-	private function _onClick ( e:Dynamic ) {
+	public function _onClick ( e:Dynamic ) {
+
+		Debug.log("GUI","This is a test");
+
+		return ;
 		var callbackList = this.callbacks.get("click");
 		if( callbackList == null ) {
 			return;
 		}
 		for( c in 0...callbackList.length ) {
-			c(e);
+			callbackList[c](e);
 		}
 	}
 }
