@@ -50,8 +50,8 @@ var Brush = (function(){
 			//
 			Map.forceMask( Map.getTileByXY( tileX - 1, tileY - 1 ), 0x0110, ts ); // top-left
 			Map.forceMask( Map.getTileByXY( tileX + 1, tileY - 1 ), 0x0011, ts ); // top-right
-			Map.forceMask( Map.getTileByXY( tileX - 1, tileY + 1 ), 0x1001, ts ); // bottom-left
-			Map.forceMask( Map.getTileByXY( tileX + 1, tileY + 1 ), 0x1100, ts ); // bottom-right
+			Map.forceMask( Map.getTileByXY( tileX + 1, tileY + 1 ), 0x1001, ts ); // bottom-right
+			Map.forceMask( Map.getTileByXY( tileX - 1, tileY + 1 ), 0x1100, ts ); // bottom-left
 
 		}
 	},{

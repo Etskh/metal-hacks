@@ -176,7 +176,7 @@ var Map = (function(){
 		//
 		chooseTileImage : function ( tile ) {
 
-			tile.dataset.mask
+			//tile.dataset.mask
 
 		},
 
@@ -200,7 +200,7 @@ var Map = (function(){
 			var neighbours = [
 				Map.getTileByXY( x, y-1 ),
 				Map.getTileByXY( x+1, y ),
-				Map.getTileByXY( x, y-1 ),
+				Map.getTileByXY( x, y+1 ),
 				Map.getTileByXY( x-1, y )
 			];
 
@@ -224,7 +224,9 @@ var Map = (function(){
 			var tiles = [];
 			DOMTiles = document.getElementById('map').childNodes;
 			for(var t=0; t<DOMTiles.length; t++ ) {
-				tiles.push( parseInt(DOMTiles[t].dataset.tileID) );
+				tiles.push( parseInt(DOMTiles[t].dataset.x ) * tilesheet.tileSize );
+				tiles.push( parseInt(DOMTiles[t].dataset.y ) * tilesheet.tileSize );
+				tiles.push( parseInt(DOMTiles[t].dataset.tileID));
 			}
 			return tiles;
 		}
