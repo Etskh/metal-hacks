@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<style>
+			BODY {
+				background:#181818;
+				color:#FFF;
+				text-shadow:#000 0px 0px 4px;
+			}
+			#map {
+				position:relative;
+				background-color:#444;
+				display:inline-block;
+				margin:0px;
+			}
+			.tile {
+				margin:0px;
+				position:absolute;
+				left:0px;
+				top:0px;
+				cursor:pointer;
+				width:64px;
+				height:64px;
+				background-image:url('environment-lobby.png');
+			}
+			.tile:hover {
+				background-color:#666;
+			}
+
+			#tools {
+				position:relative;
+				display:inline-block;
+				width:140px;
+				color:#FFF;
+				margin:0px;
+				vertical-align:top;
+			}
+
+			.brush {
+				padding:5px;
+				background:rgba( 30,200,30,0);
+			}
+
+
+			.brush .selector {
+				background:rgba( 30,30,200, 0.2);
+				cursor:pointer;
+			}
+			.brush .selector:hover {
+				background:rgba( 30,30,200, 0.4);
+			}
+
+			.brush.active {
+				background:rgba( 30,200,30, 0.1);
+				border:rgba( 30,200,30, 0.3) solid 1px;
+			}
+			.brush .options {
+				display:none;
+				font-size: 88%;
+				color:#CCC;
+			}
+			.brush.active .options {
+				display:block;
+			}
+
+			.brush .option {
+				display:block;
+			}
+
+			.brush .option .name {
+				display:inline;
+			}
+			.brush .option .value {
+				display:inline;
+				float:right;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="tools">
+			<div id="brushes">
+				<h3>Brushes</h3>
+			</div>
+			<div id="exporters">
+				<h3>Exporters</h3>
+				<button onclick="window.open().document.write(Map.export());">Export terrain</button>
+			</div>
+		</div>
+		<div id="map"></div>
+		<script type="text/javascript" src="dom.js"></script>
+		<script type="text/javascript" src="input.js"></script>
+		<script type="text/javascript" src="tile.js"></script>
+		<script type="text/javascript" src="map.js"></script>
+		<script type="text/javascript" src="brushes.js"></script>
+	</body>
+</html>

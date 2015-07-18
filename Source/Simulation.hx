@@ -36,7 +36,7 @@ class Simulation
 	public var enviro:World.Environment;
 
 	// Stage
-	public var stage:Sprite;
+	public var parent:Sprite;
 
 	// Current state logic
 	var state:SimulationState;
@@ -45,13 +45,13 @@ class Simulation
 
 
 
-	public function new ( stage:Sprite ) {
+	public function new ( parent:Sprite ) {
 
 		this.band = new Array<Character.BandMember>();
 
-		this.enviro = new World.Environment( stage );
+		this.enviro = new World.Environment( parent );
 
-		this.stage = stage;
+		this.parent = parent;
 
 		this.state = new LoadState(this);
 		this.nextState = null;
@@ -129,15 +129,16 @@ class LoadState implements SimulationState
 class WorldState implements SimulationState
 {
 	var sim:Simulation;
-	var battleButton:GUI.Widget;
+	var battleButton:GUI.Button;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
 	}
 
 	public function init () {
-		battleButton = new GUI.Button("Battle!", sim.stage );
-		battleButton.onClick( onBattleButton );
+		battleButton = new GUI.Button("Battle!", sim.parent );
+		battleButton.addEventListener( openfl.events.MouseEvent.CLICK, onBattleButton );
+		//battleButton.onClick( onBattleButton );
 	}
 
 	public function update () : Bool {

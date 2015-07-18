@@ -5,7 +5,6 @@ package;
 
 import openfl.events.MouseEvent;
 
-
 import openfl.display.Sprite;
 import openfl.geom.Point;
 import motion.easing.Bounce;
@@ -38,12 +37,16 @@ class Widget extends Sprite
 	//public var pos:Point;
 	public var desiredSize:Point;
 	var hitbox:Sprite;
+	var frame:Sprite;
 	var innerLip:Float;
 	var callbacks:Map <String, Array<WidgetCallback> >;
 
 	public function new (parent:Sprite) {
 		super();
 		parent.addChild(this);
+
+		this.frame = new Sprite();
+		addChild( frame );
 
 		// Create the event callbacks
 		this.callbacks = new Map <String, Array<WidgetCallback> >();
@@ -52,26 +55,24 @@ class Widget extends Sprite
 		this.hitbox = new Sprite();
 		addChild( hitbox );
 
-		// Adding event listeneres
-		hitbox.addEventListener( MouseEvent.CLICK, _onClick );
-
 		// Resize all the sprites
 		innerLip = 12;
 		this.resize( 64, 64);
+
+		// Adding event listeneres
+		hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
 	}
 
 	public function resize( x:Float, y:Float ) {
 		this.desiredSize = new Point(x,y);
-		draw();
 
 		this.hitbox.graphics.clear();
-		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.2 );
-		this.hitbox.graphics.drawRect( innerLip, innerLip, x-innerLip*2, y-innerLip*2 );
+		this.hitbox.graphics.beginFill( 0xFF0000, 0.2 );
+		//this.hitbox.graphics.drawRect( innerLip, innerLip, x-innerLip*2, y-innerLip*2 );
+		this.hitbox.graphics.drawRect( 0, 0, x, y );
+		this.hitbox.graphics.endFill();
 	}
 
-	public function draw() {
-		// empty
-	}
 
 	// TODO: Add a callback to this funciton
 	public function slideTo ( pos:Point, time:Float=0 ) {
@@ -85,6 +86,7 @@ class Widget extends Sprite
 
 
 	public function onClick( callback:WidgetCallback ) {
+		Debug.log("GUI","Adding callback to GUI element");
 		addCallback("click", callback );
 	}
 
@@ -98,10 +100,6 @@ class Widget extends Sprite
 	}
 
 	public function _onClick ( e:Dynamic ) {
-
-		Debug.log("GUI","This is a test");
-
-		return ;
 		var callbackList = this.callbacks.get("click");
 		if( callbackList == null ) {
 			return;
@@ -238,6 +236,25 @@ class GUISkin extends Skin implements GUI
 
 
 
+
+
+
+class Button extends Sprite
+{
+	public function new( text:String, parent:Sprite ) {
+		super();
+		parent.addChild(this);
+
+		this.graphics.clear();
+		this.graphics.beginFill( 0xFF0000, 0.2 );
+		//this.graphics.drawRect( innerLip, innerLip, x-innerLip*2, y-innerLip*2 );
+		this.graphics.drawRect( 0, 0, 128, 32 );
+		this.graphics.endFill();
+	}
+}
+
+
+/*
 class Button extends Widget
 {
 	public var skin:GUISkin;
@@ -248,102 +265,19 @@ class Button extends Widget
 		this.skin = Skin.getDefault();
 		this.resize(128,64);
 
-		skin.drawFrame( skin.buttonFrameID(), desiredSize.x, desiredSize.y, this.graphics );
+		skin.drawFrame( skin.buttonFrameID(), desiredSize.x, desiredSize.y, frame.graphics );
 	}
 }
+*/
+
+
+
+
 
 
 /*
-// Does a frame, and can have children
-//
-// TODO: this would be better suited for a CRTP
-class FramedWidget extends Widget
-{
-	static var tilesheet:Tilesheet = null;
-	static var SIZE = 16.0;
-	static var BUTTON_DEF_TL:Int;
-	static var BUTTON_DEF_TC:Int;
-	static var BUTTON_DEF_TR:Int;
-	static var BUTTON_DEF_ML:Int;
-	static var BUTTON_DEF_MC:Int;
-	static var BUTTON_DEF_MR:Int;
-	static var BUTTON_DEF_BL:Int;
-	static var BUTTON_DEF_BC:Int;
-	static var BUTTON_DEF_BR:Int;
-
-	public function new ( parent:Sprite ) {
-		super(parent);
-
-		if( tilesheet == null ) {
-			tilesheet = new Tilesheet( Assets.getBitmapData("assets/gui/gui-test.png"));
-			BUTTON_DEF_TL = tilesheet.addTileRect( new Rectangle( 0*SIZE, 0*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_TC = tilesheet.addTileRect( new Rectangle( 1*SIZE, 0*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_TR = tilesheet.addTileRect( new Rectangle( 2*SIZE, 0*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_ML = tilesheet.addTileRect( new Rectangle( 0*SIZE, 1*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_MC = tilesheet.addTileRect( new Rectangle( 1*SIZE, 1*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_MR = tilesheet.addTileRect( new Rectangle( 2*SIZE, 1*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_BL = tilesheet.addTileRect( new Rectangle( 0*SIZE, 2*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_BC = tilesheet.addTileRect( new Rectangle( 1*SIZE, 2*SIZE, SIZE, SIZE ));
-			BUTTON_DEF_BR = tilesheet.addTileRect( new Rectangle( 2*SIZE, 2*SIZE, SIZE, SIZE ));
-		}
-
-		draw();
-	}
-
-
-	override public function draw() {
-
-		// Get the closest size of the thing to the multiples of 16
-		var scale = new Point(1,1);
-		var tiles = new Array<Float>();
-
-		//var how many inside
-		var cols:Int = Std.int ( desiredSize.x / SIZE );
-		var rows:Int = Std.int ( desiredSize.y / SIZE );
-
-		// Add the four corners
-		tiles = tiles.concat([
-			0,				0,				BUTTON_DEF_TL,
-			(cols-1)*SIZE,	0,				BUTTON_DEF_TR,
-			0,				(rows-1)*SIZE,	BUTTON_DEF_BL,
-			(cols-1)*SIZE,	(rows-1)*SIZE,	BUTTON_DEF_BR,
-		]);
-
-
-		// Add the top and bottom
-		for( x in 1...cols-1 ) {
-			tiles = tiles.concat([
-				x*SIZE, 0, BUTTON_DEF_TC,
-				x*SIZE, (rows-1)*SIZE, BUTTON_DEF_BC
-			]);
-		}
-
-		// Add the left and right
-		for( y in 1...rows-1 ) {
-			tiles = tiles.concat([
-				0, y*SIZE, BUTTON_DEF_ML,
-				(cols-1)*SIZE, y*SIZE, BUTTON_DEF_MR
-			]);
-		}
-
-		// Add all the centre tiles
-		for( x in 1...cols-1 ) {
-			for( y in 1...rows-1 ) {
-				tiles = tiles.concat([x*SIZE, y*SIZE, BUTTON_DEF_MC ]);
-			}
-		}
-
-
-		// Draw them all!
-		graphics.clear();
-		tilesheet.drawTiles( this.graphics, tiles, false );
-	}
-}*/
-
-
-
-
-
+ * Unused
+ *
 class Font
 {
 	public var name:String;
@@ -403,3 +337,5 @@ class Letter
 		this.point = points;
 	}
 }
+
+*/
