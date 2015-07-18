@@ -108,7 +108,7 @@ class LoadState implements SimulationState
 
 		askr.createWorldAvatar( this.sim.enviro );
 
-		sim.changeState( new BattleState(this.sim) );
+		sim.changeState( new WorldState(this.sim) );
 		return true;
 	}
 

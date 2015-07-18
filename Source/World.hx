@@ -105,23 +105,42 @@ class Camera extends Entity
 class Environment extends Sprite
 {
 	var tilesheet:Tilesheet;
+	
+	var size:Float = 32;
 
 	public function new ( stage:Sprite ) {
 		super();
 
-		tilesheet = new Tilesheet( Assets.getBitmapData("assets/environment/environment-test.png"));
+		tilesheet = new Tilesheet( Assets.getBitmapData("assets/environment/environment-test-2.png"));
 
+		var tiles:Array<Float> = [
+			// 1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 1, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		];
+		
+		
 		for( cols in 0...16 ) {
 			for( rows in 0...16 ) {
-				tilesheet.addTileRect( new Rectangle( cols*32, rows*32, 32, 32 ));
+				tilesheet.addTileRect( new Rectangle( cols*size, rows*size, size, size ));
 			}
 		}
 
 		var drawList= new Array<Float>();
-		for( cols in 0...16 ) {
-			for( rows in 0...16 ) {
-				drawList = drawList.concat([ cols*32, rows*32, Std.random(16*16) ]);
+		var r = 0;
+		for( t in 0...tiles.length ) {
+				
+			if( t != 0 && t % 16 == 0 ) {
+				r++;
 			}
+				
+			drawList = drawList.concat([ (t%16)*size, r*size, tiles[t] ]);
 		}
 		tilesheet.drawTiles( graphics, drawList, true);
 
