@@ -1,0 +1,32 @@
+#!/usr/bin/python
+"""
+
+	save-sprint
+
+ Just a small script to save the whole state of the Source folder as an ever-
+ incrementing sprint tar file, for the purposes of retrospection, and possible
+ mass code-recovery
+
+	Author: Etskh
+	Date:	Jul 2015
+
+"""
+
+import os
+import string
+
+
+sprintDir = "Sprints"
+sprintFile= "sprint{}.txz"
+sprintFiles = os.listdir(sprintDir)
+
+highest = 0;
+for f in sprintFiles:
+	if ( "txz" in f ):
+		highest= max(highest, int( string.lstrip(f,'sprint').rstrip('.txz')))
+
+newFile = sprintFile.format(highest+1)
+
+os.system("tar --xz -cf {} Source/".format(newFile))
+os.system("mv {} {}/".format(newFile, sprintDir))
+print( 'Saved sprint #{}'.format(highest+1) )

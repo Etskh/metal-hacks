@@ -11,6 +11,7 @@ class Debug {
 		"CrowdCharacter",
 		"AbilityEffects",
 		"Avatar",
+		"GUI",
 	];
 	public static var globalFilters:Array<String> = new Array<String>();
 

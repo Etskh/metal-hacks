@@ -36,7 +36,7 @@ class Simulation
 	public var enviro:World.Environment;
 
 	// Stage
-	public var stage:Sprite;
+	public var parent:Sprite;
 
 	// Current state logic
 	var state:SimulationState;
@@ -45,13 +45,13 @@ class Simulation
 
 
 
-	public function new ( stage:Sprite ) {
+	public function new ( parent:Sprite ) {
 
 		this.band = new Array<Character.BandMember>();
 
-		this.enviro = new World.Environment( stage );
+		this.enviro = new World.Environment( parent );
 
-		this.stage = stage;
+		this.parent = parent;
 
 		this.state = new LoadState(this);
 		this.nextState = null;
@@ -106,7 +106,7 @@ class LoadState implements SimulationState
 		askr.abilities.push(Character.Ability.getByName("Groovy Lick"));
         this.sim.band.push(askr);
 
-		askr.createWorldAvatar( this.sim.enviro );
+		//askr.createWorldAvatar( this.sim.enviro );
 
 		sim.changeState( new WorldState(this.sim) );
 		return true;
@@ -121,6 +121,43 @@ class LoadState implements SimulationState
 	}
 }
 
+
+
+
+
+
+class WorldState implements SimulationState
+{
+	var sim:Simulation;
+	var battleButton:GUI.Button;
+
+	public function new (sim:Simulation) {
+		this.sim = sim;
+	}
+
+	public function init () {
+		battleButton = new GUI.Button("Battle!", sim.parent );
+		battleButton.addEventListener( openfl.events.MouseEvent.CLICK, onBattleButton );
+		//battleButton.onClick( onBattleButton );
+	}
+
+	public function update () : Bool {
+		return true;
+	}
+
+	public function exit () {
+		// empty
+	}
+
+	public function name () {
+		return "WorldState";
+	}
+
+	public function onBattleButton( e:Dynamic ) {
+		Debug.log("WorldState","Going to Battle state now!");
+	}
+
+}
 
 
 
@@ -162,9 +199,9 @@ class BattleState implements SimulationState
 		crowdMember.stats.set("impress-max", 70);
 		crowd.push( crowdMember );
 
-		infoScreen = new GUI.FramedWidget( sim.stage );
-		infoScreen.slideTo( new Point(0,0) );
-		infoScreen.resize( 64, 64 );
+		//infoScreen = new GUI.FramedWidget( sim.stage );
+		//infoScreen.slideTo( new Point(0,0) );
+		//infoScreen.resize( 64, 64 );
 	}
 
 	public function update () : Bool {
@@ -191,14 +228,12 @@ class BattleState implements SimulationState
 	}
 
 	public function exit () {
-		infoScreen.slideTo( new Point( -1 * infoScreen.desiredSize.x ,0), 2.0 );
+		//infoScreen.slideTo( new Point( -1 * infoScreen.desiredSize.x ,0), 2.0 );
 	}
 
 	public function name () {
 		return "BattleState";
 	}
-
-
 }
 
 
@@ -213,13 +248,13 @@ class SpoilsState implements SimulationState
 	public function new (sim:Simulation) {
 		this.sim = sim;
 
-		infoScreen = new GUI.FramedWidget(sim.stage);
-		infoScreen.resize( 256, 256 );
-		infoScreen.slideTo( new Point(-256,0) );
+		//infoScreen = new GUI.FramedWidget(sim.stage);
+		//infoScreen.resize( 256, 256 );
+		//infoScreen.slideTo( new Point(-256,0) );
 	}
 
 	public function init () {
-		infoScreen.slideTo( new Point( (sim.stage.width/2) + 128, 0), 2);
+		//infoScreen.slideTo( new Point( (sim.stage.width/2) + 128, 0), 2);
 	}
 
 	public function update () : Bool {
