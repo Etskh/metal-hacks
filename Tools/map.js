@@ -61,6 +61,9 @@ var Map = (function(){
 			map.appendChild( CreateTile( x, y ));
 		}
 	}
+
+	map.style.width = size.x * tilesheet.tileSize;
+	map.style.height= size.y * tilesheet.tileSize;
 	console.log("Map initialised");
 
 
@@ -166,6 +169,14 @@ var Map = (function(){
 			//
 			var cell = tileset.getCellWithMask( mask );
 			Map.setTileImage( tile, cell.random() );
+
+			// Make the neighbours update themselves
+			//
+			Map.allNeighbours( tile, function( neighbour ) {
+				if( neighbour ) {
+					Map.chooseTileImage( neighbour );
+				}
+			});
 		},
 
 
@@ -176,7 +187,24 @@ var Map = (function(){
 		//
 		chooseTileImage : function ( tile ) {
 
-			//tile.dataset.mask
+			// If it's not currently a thing, then
+			// just return
+			//
+			if ( parseInt(tile.dataset.tileset) === 0 ) {
+				return;
+			}
+
+			// Get tileset
+			//
+			var tileset = tilesheet.getTileSetByID( parseInt(tile.dataset.tileset) );
+
+			// If no mask, compute it from neighbours
+			//
+			var mask = Map.computeMask( tile );
+
+			// Set the new tile to that the new mask
+			var cell = tileset.getCellWithMask( mask );
+			Map.setTileImage( tile, cell.random() );
 
 		},
 
@@ -189,10 +217,6 @@ var Map = (function(){
 		// pass the neighbour into the callback function
 		//
 		allNeighbours : function ( tile, callback ) {
-
-			if( tile != null ) {
-
-			}
 
 			var x = parseInt( tile.dataset.x );
 			var y = parseInt( tile.dataset.y );
@@ -232,6 +256,3 @@ var Map = (function(){
 		}
 	}
 })();
-
-
-

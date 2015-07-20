@@ -34,7 +34,6 @@ var Brush = (function(){
 			var ts = Map.getTilesheet().getTileSetByID( options.selectedSet );
 
 			Map.forceMask( tile, 0x1111, ts );
-			//Map.setTileImage( tile, ts.getCellWithMask( 0x1111 ).random(), 0x1111 );
 
 			var tileX = parseInt( tile.dataset.x );
 			var tileY = parseInt( tile.dataset.y );
@@ -52,6 +51,19 @@ var Brush = (function(){
 			Map.forceMask( Map.getTileByXY( tileX + 1, tileY - 1 ), 0x0011, ts ); // top-right
 			Map.forceMask( Map.getTileByXY( tileX + 1, tileY + 1 ), 0x1001, ts ); // bottom-right
 			Map.forceMask( Map.getTileByXY( tileX - 1, tileY + 1 ), 0x1100, ts ); // bottom-left
+
+		}
+	},{
+		name: "Terrain Single",
+		desc: "Sets the single tile and modifies all surrounding tiles",
+		options: {
+			"selectedSet" : 0x01,
+		},
+		exec: function( tile, options ) {
+
+			var ts = Map.getTilesheet().getTileSetByID( options.selectedSet );
+			Map.setTileImage( tile, ts.getCellWithMask( options.mask ).random() );
+
 
 		}
 	},{
@@ -180,4 +192,3 @@ var Brush = (function(){
 	}
 })();
 Brush.select(0);
-

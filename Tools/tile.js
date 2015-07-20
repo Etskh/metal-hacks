@@ -14,6 +14,7 @@ var Mask = {
 	},
 
 
+
 	//
 	// Merges the mask components back together
 	//
@@ -21,12 +22,16 @@ var Mask = {
 		return 0x1000*components[0] + 0x100*components[1] + 0x10*components[2] + components[3];
 	},
 
+
+
 	//
 	// Create a mask with a single
 	//
 	create : function( id, T, R, B, L ) {
 		return 0x1000*id*T + 0x100*id*R + 0x10*id*B + id*L;
 	},
+
+
 
 	//
 	// Stomps over mask left's components if mask right's aren't 0
@@ -43,6 +48,8 @@ var Mask = {
 		return Mask.fromComponents( maskLeftComp );
 	},
 };
+
+
 
 
 function Cell ( tileID, mask ) {
@@ -68,13 +75,12 @@ function TileSet( id, name, breadth, data ) {
 					return _tileset.cells[c];
 				}
 			}
+			console.error("Couldn't find cell with mask of "+mask.toString(16) );
 			return null;
 		},
 	};
 
 	function addCell( tileID, mask ) {
-
-		console.log("Adding cell with tileID:"+tileID+", with mask: "+mask.toString(16));
 
 		for( var c=0; c< _tileset.cells.length; c++ ) {
 			if( _tileset.cells[c].mask == mask ) {
@@ -100,15 +106,36 @@ function TileSet( id, name, breadth, data ) {
 
 			// Edges
 			addCell( data.areas[f]-breadth, Mask.create(id,0,1,1,1) );		// Top
-			addCell( data.areas[f] + 1,		Mask.create(id,1,0,1,1) );		// Right
+			addCell( data.areas[f] + 1,			Mask.create(id,1,0,1,1) );		// Right
 			addCell( data.areas[f]+breadth,	Mask.create(id,1,1,0,1) );		// Bottom
-			addCell( data.areas[f] - 1,		Mask.create(id,1,1,1,0) );		// Left
+			addCell( data.areas[f] - 1,			Mask.create(id,1,1,1,0) );		// Left
 
 			// Corners
 			addCell((data.areas[f]-breadth)-1,	Mask.create(id,0,1,1,0) );	// Top-Left
 			addCell((data.areas[f]-breadth)+1,	Mask.create(id,0,0,1,1) );	// Top-Right
 			addCell((data.areas[f]+breadth)-1,	Mask.create(id,1,1,0,0) );	// Bottom-Left
 			addCell((data.areas[f]+breadth)+1,	Mask.create(id,1,0,0,1) );	// Bottom-Right
+		}
+	}
+
+	if( data.stars ) {
+		for( var f=0; f<data.stars.length; f++) {
+
+			// Fill
+			addCell( data.stars[f], fillMask );
+
+			// Points
+			addCell( data.stars[f]-breadth*2, Mask.create(id,0,0,1,0) );		// Top
+			addCell( data.stars[f] + 2,				Mask.create(id,0,0,0,1) );		// Right
+			addCell( data.stars[f]+breadth*2,	Mask.create(id,1,0,0,0) );		// Bottom
+			addCell( data.stars[f] - 2,				Mask.create(id,0,1,0,0) );		// Left
+
+			// Columns
+			addCell( data.stars[f]-breadth, Mask.create(id,1,0,1,0) );		// Top
+			addCell( data.stars[f] + 1,			Mask.create(id,0,1,0,1) );		// Right
+			addCell( data.stars[f]+breadth,	Mask.create(id,1,0,1,0) );		// Bottom
+			addCell( data.stars[f] - 1,			Mask.create(id,0,1,0,1) );		// Left
+
 		}
 	}
 
@@ -124,7 +151,8 @@ function TileSheet() {
 	var _tilesets = [
 		TileSet( 0x1, "Stone", (sheetSize/tileSize), {
 			fills: [ 0x2E, 0x2F ],
-			areas: [ 0x12, 0x15 ],
+			areas: [ 0x12, 0x15, 0x18 ],
+			stars: [ 0x52 ],
 		})
 	];
 
@@ -155,6 +183,3 @@ function TileSheet() {
 		},
 	};
 }
-
-
-
