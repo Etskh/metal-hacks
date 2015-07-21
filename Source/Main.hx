@@ -42,7 +42,7 @@ class Main extends Sprite {
 		background.graphics.beginFill(0x324599);
 		background.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
 		addChild(background);
-		background.addEventListener( MouseEvent.CLICK, this._onClick );
+		//background.addEventListener( MouseEvent.CLICK, this._onClick );
 
   	// Start-up blurb
   	//
@@ -52,7 +52,7 @@ class Main extends Sprite {
       sysName = Sys.systemName();
       sysTime = Std.string( Sys.time() );
     #end
-  	Debug.log("System", "Week 4 Development Branch - " + sysTime );
+  	Debug.log("System", "Week 6 Development Branch - " + sysTime );
   	Debug.log("System", "debug "+ sysName );
 
     // Add the main simulation object
