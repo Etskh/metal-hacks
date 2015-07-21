@@ -33,10 +33,10 @@ import Simulation;
 //
 class Main extends Sprite {
 
-    public function new() {
+  public function new() {
 		super ();
 
-		//
+		// Create the background
 		//
 		var background = new Sprite();
 		background.graphics.beginFill(0x324599);
@@ -44,14 +44,22 @@ class Main extends Sprite {
 		addChild(background);
 		background.addEventListener( MouseEvent.CLICK, this._onClick );
 
-    	// Start-up blurb
-    	//
-    	Debug.log("System", "Week 4 Development Branch - " + Sys.time());
-    	Debug.log("System", "debug "+ Sys.systemName() );
+  	// Start-up blurb
+  	//
+    var sysName = "Flash";
+    var sysTime = "Unknown";
+    #if !flash
+      sysName = Sys.systemName();
+      sysTime = Std.string( Sys.time() );
+    #end
+  	Debug.log("System", "Week 4 Development Branch - " + sysTime );
+  	Debug.log("System", "debug "+ sysName );
 
-        var simulation = new Simulation( background );
-		addEventListener (Event.ENTER_FRAME, simulation.run );
-    }
+    // Add the main simulation object
+    //
+    var simulation = new Simulation( background );
+    addEventListener (Event.ENTER_FRAME, simulation.run );
+  }
 
 	public function _onClick( e:Dynamic ) {
 		Debug.log("System", "Proving it works");

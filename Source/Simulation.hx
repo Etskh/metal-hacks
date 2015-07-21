@@ -104,7 +104,7 @@ class LoadState implements SimulationState
 		var askr = new Character.BandMember("Askr");
 		askr.abilities = new Array<Character.Ability>();
 		askr.abilities.push(Character.Ability.getByName("Groovy Lick"));
-        this.sim.band.push(askr);
+    this.sim.band.push(askr);
 
 		//askr.createWorldAvatar( this.sim.enviro );
 
@@ -133,11 +133,11 @@ class WorldState implements SimulationState
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
+		this.battleButton = new GUI.Button("Battle!", sim.parent );
 	}
 
 	public function init () {
-		battleButton = new GUI.Button("Battle!", sim.parent );
-		battleButton.addEventListener( openfl.events.MouseEvent.CLICK, onBattleButton );
+		//battleButton.addEventListener( openfl.events.MouseEvent.CLICK, onBattleButton );
 		//battleButton.onClick( onBattleButton );
 	}
 
