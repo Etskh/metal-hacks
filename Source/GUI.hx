@@ -54,21 +54,18 @@ class Widget extends Sprite
 		// Creating the hitbox
 		this.hitbox = new Sprite();
 		addChild( hitbox );
+		this.hitbox.buttonMode = true;
+		this.hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
 
 		// Resize all the sprites
 		innerLip = 12;
 		this.resize( 64, 64);
-
-		// Adding event listeneres
-		hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
 	}
 
 	public function resize( x:Float, y:Float ) {
 		this.desiredSize = new Point(x,y);
-
 		this.hitbox.graphics.clear();
-		this.hitbox.graphics.beginFill( 0xFF0000, 0.2 );
-		//this.hitbox.graphics.drawRect( innerLip, innerLip, x-innerLip*2, y-innerLip*2 );
+		this.hitbox.graphics.beginFill( 0xFF0000, 0.3 );
 		this.hitbox.graphics.drawRect( 0, 0, x, y );
 		this.hitbox.graphics.endFill();
 	}
@@ -100,6 +97,7 @@ class Widget extends Sprite
 	}
 
 	public function _onClick ( e:Dynamic ) {
+		trace("CLICKED");
 		var callbackList = this.callbacks.get("click");
 		if( callbackList == null ) {
 			return;
@@ -243,31 +241,33 @@ class GUISkin extends Skin implements GUI
 
 
 
-/*class Button extends Sprite
-{
-	public function new ( text:String, parent:Sprite ) {
-		super();
-		parent.addChild(this);
-
-
-
-	}
-}*/
 
 
 class Button extends Widget
 {
 	public var skin:GUISkin;
+	var textSprite:Sprite;
 
 	public function new( text:String, parent:Sprite=null ) {
 		super(parent);
 
+		this.hitbox.buttonMode = true;
+		this.hitbox.useHandCursor = true;
+
+		this.textSprite = new Sprite();
+		addChild( this.textSprite );
+
 		this.skin = Skin.getDefault();
 		this.resize(128,64);
 
-		this.skin.getFont().drawText( text, 32, this.graphics );
+		this.skin.getFont().drawText( text, 32, this.textSprite.graphics );
 	}
 }
+
+
+
+
+
 
 
 class Letter {
@@ -282,6 +282,12 @@ class Letter {
 	}
 
 }
+
+
+
+
+
+
 
 
 class Font {
@@ -311,30 +317,30 @@ class Font {
 
 		var data:Array<Letter> = [
 			// special
-			new Letter(" ", 0xFF ),
+			new Letter(" ", 0xFF, 0.3),
 
 		  // 0 - lowercase
-			new Letter("a", 0x00, 0.6),
+			new Letter("a", 0x00, 0.5),
 			new Letter("b", 0x01 ),
 			new Letter("c", 0x02 ),
 			new Letter("d", 0x03 ),
-			new Letter("e", 0x04, 0.65 ),
+			new Letter("e", 0x04, 0.5 ),
 			new Letter("f", 0x05 ),
 			new Letter("g", 0x06 ),
 			new Letter("h", 0x07 ),
 			new Letter("i", 0x08 ),
 			new Letter("j", 0x09 ),
 			new Letter("k", 0x0A ),
-			new Letter("l", 0x0B, 0.3 ),
+			new Letter("l", 0x0B, 0.25 ),
 			new Letter("m", 0x0C ),
 			new Letter("n", 0x0D ),
-			new Letter("o", 0x0E ),
+			new Letter("o", 0x0E, 0.5),
 			new Letter("p", 0x0F ),
 			// 1 - lowercase
 			new Letter("q", 0x10 ),
 			new Letter("r", 0x11 ),
 			new Letter("s", 0x12 ),
-			new Letter("t", 0x13, 0.4),
+			new Letter("t", 0x13, 0.35),
 			new Letter("u", 0x14 ),
 			new Letter("v", 0x15 ),
 			new Letter("w", 0x16 ),
@@ -362,7 +368,7 @@ class Font {
 			new Letter("Q", 0x30 ),
 			new Letter("R", 0x31 ),
 			new Letter("S", 0x32 ),
-			new Letter("T", 0x33 ),
+			new Letter("T", 0x33, 0.5),
 			new Letter("U", 0x34 ),
 			new Letter("V", 0x35 ),
 			new Letter("W", 0x36 ),
@@ -376,7 +382,7 @@ class Font {
 			new Letter(",", 0x51 ),
 			new Letter(":", 0x52 ),
 			new Letter(";", 0x53 ),
-			new Letter("!", 0x54, 0.28),
+			new Letter("!", 0x54, 0.25),
 			new Letter("?", 0x55 ),
 			new Letter("-", 0x56 ),
 			new Letter("(", 0x57 ),
@@ -387,6 +393,8 @@ class Font {
 			this.letters.set(data[l].charCode, data[l]);
 		}
 	}
+
+
 
 
 	public function drawText ( text:String, size:Float, graphics:openfl.display.Graphics ) {
@@ -413,4 +421,23 @@ class Font {
 
 		tilesheet.drawTiles( graphics, drawList, true, Tilesheet.TILE_SCALE);
 	}
+
+
+	// Gets the text's estimated width in pixels
+	// Right now, it returns the exact measurements, but don't expect it
+	// to always be perfect, as this function is made to be more of an estimate
+	//
+	public function getTextWidth ( text:String, size:Float ):Float {
+		var cursor:Float = 0;
+		for( c in 0...text.length ) {
+			var letter:Letter = this.letters.get( text.charCodeAt(c) );
+			if( letter == null ) {
+				trace("ERROR: Could not find code for `"+text.charAt(c)+"` character.");
+				continue;
+			}
+			cursor += size * letter.breadth;
+		}
+		return cursor;
+	}
+
 }
