@@ -18,7 +18,11 @@ class Debug {
 	public static function log ( cat:String, text:String ) {
 		#if debug
 		if( filters.indexOf( cat ) != -1 ) {
+			#if flash
+			trace(cat+": "+text );
+			#else
 			Sys.println(cat+": "+text );
+			#end
 		}
 		if( globalFilters.indexOf( cat ) == -1 ) {
 			globalFilters.push( cat );
