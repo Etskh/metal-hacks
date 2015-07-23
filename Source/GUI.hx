@@ -17,16 +17,10 @@ import openfl.geom.Rectangle;
 
 
 
-interface GUI
-{
-	public function windowFrameID	() : Int ;
-	public function buttonFrameID	() : Int ;
-}
 
 
 
-
-
+/*
 
 // Does animating, placement, and flow
 //
@@ -36,14 +30,13 @@ class Widget extends Sprite
 {
 	//public var pos:Point;
 	public var desiredSize:Point;
-	var hitbox:Sprite;
+	public var hitbox:Sprite;
 	var frame:Sprite;
 	var innerLip:Float;
 	var callbacks:Map <String, Array<WidgetCallback> >;
 
-	public function new (parent:Sprite) {
+	public function new () {
 		super();
-		parent.addChild(this);
 
 		this.frame = new Sprite();
 		addChild( frame );
@@ -107,9 +100,15 @@ class Widget extends Sprite
 		}
 	}
 }
+*/
 
 
 
+interface GUI
+{
+	public function windowFrameID	() : Int ;
+	public function buttonFrameID	() : Int ;
+}
 
 
 
@@ -219,7 +218,7 @@ class GUISkin extends Skin implements GUI
 	var basicWindowID:Int;
 	var font:Font;
 
-	public function new( ) {
+	public function new() {
 		super("assets/gui/gui-test.png", 16.0);
 
 		basicButtonID = addFrame( 0, 0 );
@@ -241,15 +240,88 @@ class GUISkin extends Skin implements GUI
 
 
 
+class Widget extends Sprite
+{
+
+}
+
 
 
 class Button extends Widget
 {
 	public var skin:GUISkin;
+	var size:Point;
+	var frameSprite:Sprite;
+	var textSprite:Sprite;
+	var hitbox:Sprite;
+
+	// use swapChildrenAt( default, highlight );
+
+	public function new ( text:String ) {
+		super();
+
+		this.skin = Skin.getDefault();
+
+		this.size = new Point(128,32);
+
+		this.frameSprite= new Sprite();
+		this.skin.drawFrame( this.skin.buttonFrameID(), size.x, size.y, this.frameSprite.graphics );
+		addChild(this.frameSprite);
+
+		this.textSprite = new Sprite();
+		textSprite.y = 6;
+		this.skin.getFont().drawText( text, 16, this.textSprite.graphics, size.x, Font.Centre );
+		addChild( this.textSprite );
+
+		this.hitbox = new Sprite();
+		this.hitbox.buttonMode = true;
+		this.hitbox.graphics.clear();
+		this.hitbox.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
+		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
+		this.hitbox.graphics.endFill();
+		this.hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
+		this.hitbox.addEventListener( MouseEvent.MOUSE_OVER, this._onOver );
+		this.hitbox.addEventListener( MouseEvent.MOUSE_OUT, this._onOut );
+		this.hitbox.addEventListener( MouseEvent.MOUSE_DOWN, this._onDown );
+		this.hitbox.addEventListener( MouseEvent.MOUSE_UP, this._onOver );
+		addChild( this.hitbox );
+	}
+
+	public function _onClick ( e:Dynamic ) {
+		trace("Works...");
+	}
+	public function _onOver ( e:Dynamic ) {
+		this.hitbox.graphics.clear();
+		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.05 );
+		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
+		this.hitbox.graphics.endFill();
+		trace("Over!");
+	}
+	public function _onOut ( e:Dynamic ) {
+		this.hitbox.graphics.clear();
+		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.0 );
+		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
+		this.hitbox.graphics.endFill();
+		trace("Out!");
+	}
+	public function _onDown ( e:Dynamic ) {
+		this.hitbox.graphics.clear();
+		this.hitbox.graphics.beginFill( 0x000000, 0.2 );
+		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
+		this.hitbox.graphics.endFill();
+		trace("DOWN!");
+	}
+}
+
+
+/*
+class Button extends Widget
+{
+	public var skin:GUISkin;
 	var textSprite:Sprite;
 
-	public function new( text:String, parent:Sprite=null ) {
-		super(parent);
+	public function new( text:String ) {
+		super();
 
 		this.hitbox.buttonMode = true;
 		this.hitbox.useHandCursor = true;
@@ -260,10 +332,10 @@ class Button extends Widget
 		this.skin = Skin.getDefault();
 		this.resize(128,64);
 
-		this.skin.getFont().drawText( text, 32, this.textSprite.graphics );
+		this.skin.getFont().drawText( text, 24, this.textSprite.graphics );
 	}
 }
-
+*/
 
 
 
@@ -291,6 +363,11 @@ class Letter {
 
 
 class Font {
+
+	public static inline var Centre=0;
+	public static inline var Center=0;
+	public static inline var Left=1;
+	public static inline var Right=2;
 
 	var breadth:Int;
 	var tileSize:Int;
@@ -397,10 +474,18 @@ class Font {
 
 
 
-	public function drawText ( text:String, size:Float, graphics:openfl.display.Graphics ) {
+	public function drawText ( text:String, size:Float, graphics:openfl.display.Graphics, width:Float, align:Int ) {
 		var drawList:Array<Float> = new Array<Float>();
 
-		var cursor:Float = 0;
+		// Choose a starting position
+		var cursor:Float = (
+			(align==Font.Left)?
+				0 : ((align==Font.Right) ?
+					width - this.getTextWidth(text,size) :
+					width/2 - this.getTextWidth(text,size)/2
+				)
+			);
+
 		for( c in 0...text.length ) {
 			var letter:Letter = this.letters.get( text.charCodeAt(c) );
 			if( letter == null ) {

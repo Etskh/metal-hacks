@@ -52,12 +52,16 @@ class Simulation
 		this.enviro = new World.Environment( parent );
 
 		this.parent = parent;
+		parent.addEventListener( MouseEvent.CLICK, _onClick );
 
 		this.state = new LoadState(this);
 		this.nextState = null;
 		this.state.init();
 	}
 
+	public function _onClick( e:Dynamic ) {
+		//trace("Simulation recieves events!");
+	}
 
 	public function changeState( state:SimulationState ) {
 		this.nextState = state;
@@ -106,8 +110,6 @@ class LoadState implements SimulationState
 		askr.abilities.push(Character.Ability.getByName("Groovy Lick"));
     this.sim.band.push(askr);
 
-		//askr.createWorldAvatar( this.sim.enviro );
-
 		sim.changeState( new WorldState(this.sim) );
 		return true;
 	}
@@ -130,15 +132,18 @@ class WorldState implements SimulationState
 {
 	var sim:Simulation;
 	var battleButton:GUI.Button;
+	var testSprite:Sprite;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
-		this.battleButton = new GUI.Button("Battle!", sim.parent );
 	}
 
 	public function init () {
-		//battleButton.addEventListener( openfl.events.MouseEvent.CLICK, onBattleButton );
-		//battleButton.onClick( onBattleButton );
+
+		this.battleButton = new GUI.Button("To Battle!");
+		this.sim.parent.addChild( this.battleButton );
+		//this.battleButton.addEventListener( MouseEvent.CLICK, this.onBattleButton );
+		//this.battleButton.onClick( this.onBattleButton );
 	}
 
 	public function update () : Bool {
@@ -154,7 +159,8 @@ class WorldState implements SimulationState
 	}
 
 	public function onBattleButton( e:Dynamic ) {
-		Debug.log("WorldState","Going to Battle state now!");
+		//Debug.log("WorldState","Going to Battle state now!");
+		trace("I bet it works now...");
 	}
 
 }

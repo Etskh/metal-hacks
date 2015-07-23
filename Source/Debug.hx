@@ -29,4 +29,10 @@ class Debug {
 		}
 		#end
 	}
+
+	#if debug
+	public static var drawHitboxes = true;
+	#else
+	public static var drawHitboxes = false;
+	#end
 }
