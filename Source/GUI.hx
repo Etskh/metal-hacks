@@ -288,54 +288,36 @@ class Button extends Widget
 	}
 
 	public function _onClick ( e:Dynamic ) {
-		trace("Works...");
+		// And here is the actual click
 	}
 	public function _onOver ( e:Dynamic ) {
 		this.hitbox.graphics.clear();
 		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.05 );
 		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
 		this.hitbox.graphics.endFill();
-		trace("Over!");
 	}
 	public function _onOut ( e:Dynamic ) {
 		this.hitbox.graphics.clear();
 		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.0 );
 		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
 		this.hitbox.graphics.endFill();
-		trace("Out!");
 	}
 	public function _onDown ( e:Dynamic ) {
 		this.hitbox.graphics.clear();
 		this.hitbox.graphics.beginFill( 0x000000, 0.2 );
 		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
 		this.hitbox.graphics.endFill();
-		trace("DOWN!");
 	}
 }
 
 
-/*
-class Button extends Widget
-{
-	public var skin:GUISkin;
-	var textSprite:Sprite;
 
-	public function new( text:String ) {
-		super();
 
-		this.hitbox.buttonMode = true;
-		this.hitbox.useHandCursor = true;
 
-		this.textSprite = new Sprite();
-		addChild( this.textSprite );
 
-		this.skin = Skin.getDefault();
-		this.resize(128,64);
 
-		this.skin.getFont().drawText( text, 24, this.textSprite.graphics );
-	}
-}
-*/
+
+
 
 
 
@@ -354,9 +336,6 @@ class Letter {
 	}
 
 }
-
-
-
 
 
 

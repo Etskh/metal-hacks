@@ -131,12 +131,12 @@ class BandMember extends Character
 		this.stats.set("energy-per-second", 1.0 );
 	}
 
-	public function createWorldAvatar( enviro:World.Environment ) {
+	public function createWorldAvatar() {
 
 		// Do init stuff, like assigning equipment and hair and stuff
 		//
 
-		return new World.BandMemberWorldAvatar( enviro );
+		return new World.BandMemberWorldAvatar( );
 	}
 }
 

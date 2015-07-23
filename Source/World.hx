@@ -10,6 +10,7 @@ import motion.easing.Sine;
 import motion.Actuate;
 
 import openfl.display.Sprite;
+import openfl.display.BitmapData;
 import openfl.display.Tilesheet;
 import openfl.Assets;
 import openfl.geom.Rectangle;
@@ -20,14 +21,8 @@ import openfl.geom.Point; // Camera
 
 class Entity extends Sprite
 {
-	public var pos:Point;
-
-	public function new ( parent:Sprite ) {
+	public function new ( ) {
 		super();
-
-		parent.addChild( this );
-
-		this.pos = new Point(0,0);
 	}
 
 	// TODO: Add a callback to this funciton
@@ -42,7 +37,7 @@ class Entity extends Sprite
 
 	// TODO: Add a callback to this function
 	public function walk ( pos:Point, speed:Float=128 ) {
-		var distance = Point.distance( pos, this.pos );
+		var distance = Point.distance( pos, new Point( this.x, this.y) );
 		move( pos, distance / speed );
 	}
 
@@ -52,23 +47,99 @@ class Entity extends Sprite
 }
 
 
+
+class CompositeColour
+{
+	public var r:UInt;
+	public var g:UInt;
+	public var b:UInt;
+
+	public function new ( colour:UInt ) {
+		this.r = (colour & 0x00FF0000) >> 16;
+		this.g = (colour & 0x0000FF00) >>  8;
+		this.b = (colour & 0x000000FF) >>  0;
+
+		trace( this.r );
+		trace( this.g );
+		trace( this.b );
+	}
+
+	public function toUInt () {
+
+	}
+}
+
+
+
 class Avatar extends Entity
 {
 	var tilesheet:Tilesheet;
 	var hitbox:Sprite;
+	var animation:Sprite;
+	var size:Point;
 
-	public function new ( enviro:World.Environment ) {
-		super(enviro);
+	public function new ( ) {
+		super();
+
+		this.size = new Point(64,64);
+
+		this.animation = new Sprite();
+		addChild( this.animation );
 
 		this.hitbox = new Sprite();
-		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.2 );
-		this.hitbox.graphics.drawRect( 0, 0, 64, 64 );
+		this.hitbox.graphics.beginFill( 0xFF0000, 0.2 );
+		//this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
 		addChild( hitbox );
 
-		this.tilesheet = new Tilesheet( Assets.getBitmapData("assets/characters/character-test.png"));
-		this.tilesheet.addTileRect( new Rectangle( 0, 0, 64, 64 ));
-		this.tilesheet.drawTiles( this.graphics, [0, 0, 0], true);
+		var bitmapData = Assets.getBitmapData("assets/characters/character-rgb-test.png");
 
+		// EquipmentRender here
+		//
+		this.renderEquipment( bitmapData, 0xe6dbbf, 0x161719, 0xcf3213 );
+		//this.renderEquipment( bitmapData, 0x6d563d, 0x161719, 0xcf3213 );
+
+		this.tilesheet = new Tilesheet( bitmapData );
+		this.tilesheet.addTileRect( new Rectangle( 0, 0, size.x, size.y ));
+		this.tilesheet.drawTiles( this.animation.graphics, [0, 0, 0], true);
+
+	}
+
+	public function renderEquipment( input:BitmapData, skinColour:UInt, mainColour:UInt, detailColour:UInt ) : BitmapData
+	{
+		var pixels:openfl.utils.ByteArray;
+		var allOfIt = new Rectangle(0,0, input.width, input.height );
+
+		input.lock();
+
+		var skin = new CompositeColour( skinColour );
+		var main = new CompositeColour( mainColour );
+		var detail = new CompositeColour( detailColour );
+
+		pixels = input.getPixels(allOfIt);
+		var skinLevel:Float;
+		var mainLevel:Float;
+		var detlLevel:Float;
+
+		for( p in 0...input.width*input.height) {
+
+			// If it's transparent, just skip it
+			if( pixels[p*4+0] == 0 ) {
+				continue;
+			}
+			skinLevel = pixels[p*4+1] / 255.0;
+			mainLevel = pixels[p*4+2] / 255.0;
+			detlLevel = pixels[p*4+3] / 255.0;
+
+			pixels[p*4+0] = pixels[p*4+0]; // alpha
+			pixels[p*4+1] = Std.int( (skinLevel*skin.r) + (mainLevel*main.r) + (detlLevel*detail.r));
+			pixels[p*4+2] = Std.int( (skinLevel*skin.g) + (mainLevel*main.g) + (detlLevel*detail.g));
+			pixels[p*4+3] = Std.int( (skinLevel*skin.b) + (mainLevel*main.b) + (detlLevel*detail.b));
+			
+		}
+
+		input.setPixels(allOfIt, pixels);
+		input.unlock();
+		return input;
 	}
 }
 
@@ -78,8 +149,8 @@ class BandMemberWorldAvatar extends Avatar
 {
 	public static inline var MOVE_SPEED=128; // pixels a second
 
-	public function new ( enviro:World.Environment ) {
-		super(enviro);
+	public function new () {
+		super();
 		hitbox.addEventListener( MouseEvent.CLICK, onActivate );
 	}
 
@@ -93,10 +164,20 @@ class BandMemberWorldAvatar extends Avatar
 
 
 
+
+class World
+{
+
+}
+
+
+
+
+
 class Camera extends Entity
 {
-	public function new ( parent:Sprite ) {
-		super(parent);
+	public function new () {
+		super();
 	}
 }
 

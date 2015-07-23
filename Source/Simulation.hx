@@ -132,7 +132,7 @@ class WorldState implements SimulationState
 {
 	var sim:Simulation;
 	var battleButton:GUI.Button;
-	var testSprite:Sprite;
+	var dude:World.Avatar;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
@@ -142,8 +142,11 @@ class WorldState implements SimulationState
 
 		this.battleButton = new GUI.Button("To Battle!");
 		this.sim.parent.addChild( this.battleButton );
-		//this.battleButton.addEventListener( MouseEvent.CLICK, this.onBattleButton );
-		//this.battleButton.onClick( this.onBattleButton );
+
+		this.dude = new World.Avatar();
+		this.dude.x = 64;
+		this.dude.y = 64;
+		this.sim.parent.addChild( this.dude );
 	}
 
 	public function update () : Bool {
