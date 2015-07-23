@@ -69,12 +69,15 @@ class StatBlock
 class Character
 {
 	public var name:String;
+	public var level:Int;
 	public var stats:StatBlock;
 	public var abilities:Array<Ability>;
 
 	public function new ( name:String ) {
 
 		this.name = name;
+
+		this.level = 1;
 
 		this.abilities = new Array<Ability>();
 
@@ -166,6 +169,46 @@ class Ability
 		}
 	}
 
+	//
+	// Parses the effect based on the character
+	//
+	public function getDesc(character:Character, targets:Array<Character> ):String {
+		var finalDesc:String = this.desc;
+		var replacements = new Map<String,String>();
+
+
+
+		//
+		// {effect-N-max} -- gets the highest effect possible
+		//
+		for( e in 0...this.effects.length ) {
+			replacements.set(
+				"{effect-"+Std.string(e)+"-max}",
+				Std.string(this.effects[e].getMax(character, targets))
+			);
+		}
+		//
+		// {effect-N-stat} -- gets the affected or causal stat
+		//
+		for( e in 0...this.effects.length ) {
+			replacements.set(
+				"{effect-"+Std.string(e)+"-stat}",
+				this.effects[e].getStat()
+			);
+		}
+
+		// Cut the string into an array,
+		// sew it back together,
+		// splicing the value between each element
+		//
+		var itr = replacements.keys();
+		while( itr.hasNext() ) {
+			var key:String = itr.next();
+			finalDesc = finalDesc.split(key).join(replacements.get(key));
+		}
+		return finalDesc;
+	}
+
 	static public function loadAll ( ) {
 
 		// Already loaded
@@ -179,9 +222,14 @@ class Ability
 
 		// MAYBETODO: Load them in from a file? Maybe?
 
-		var ability = new Ability("Groovy Lick");
-		ability.desc = "Impresses one target for up to 150% of your technique ({effect-0-max})";
-		ability.effects.push( new AbilityEffectImpress( 1.5, "technique" ));
+		ability = new Ability("Dive-Bomb");
+		ability.desc = "Impresses one target for up to 150% of your {effect-0-stat} ({effect-0-max})";
+		ability.effects.push( new AbilityEffectImpress( 1.5, "charisma" ));
+		abilities.push( ability );
+
+		ability = new Ability("Spotlight");
+		ability.desc = "Grants this band-member {effect-0-max}% more {effect-0-stat} for {effect-0-duration} bars (scales with level)";
+		ability.effects.push( new AbilityEffectBuffScaled( "spotlight", 0.1, "charisma", 4 ));
 		abilities.push( ability );
 	}
 
@@ -206,6 +254,7 @@ class Ability
 interface AbilityEffect
 {
 	public function getMax	( caster:Character, targets:Array<Character> ) : Float;
+	public function getStat	( ) : String;
 	public function exec	( success:Float, caster:Character, targets:Array<Character> ) : Void;
 }
 
@@ -230,6 +279,11 @@ class AbilityEffectImpress implements AbilityEffect
 		return caster.stats.get( this.statBase ) * scalar;
 	}
 
+	public function getStat	( ) : String
+	{
+		return statBase;
+	}
+
 	public function exec ( success:Float, caster:Character, targets:Array<Character>)
 	{
 		var oldImpress = targets[0].stats.get("impress");
@@ -238,4 +292,37 @@ class AbilityEffectImpress implements AbilityEffect
 
 		Debug.log("AbilityEffects", caster.name+" impresses "+ targets[0].name+" for "+ (val* success) );
 	}
+}
+
+
+class AbilityEffectBuffScaled implements AbilityEffect
+{
+	var name:String;
+	var amount:Float;
+	var stat:String;
+	var duration:Float;
+
+	public function new( name:String, amount:Float, stat:String, duration:Float )
+	{
+		this.name = name;
+		this.amount= amount;
+		this.stat = stat;
+		this.duration = duration;
+	}
+
+	public function getMax	( caster:Character, targets:Array<Character> ) : Float
+	{
+		return caster.stats.get( this.stat ) * amount;
+	}
+
+	public function getStat	( ) : String
+	{
+		return stat;
+	}
+
+	public function exec ( success:Float, caster:Character, targets:Array<Character>)
+	{
+		// TODO: implement this
+	}
+
 }
