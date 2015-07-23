@@ -1,9 +1,13 @@
 
-
-
-
+//
+// The brush API
+//
 var Brush = (function(){
 
+	//
+	// The list of brushes
+	//
+	//
 	var brushes = [{
 		name: "Single Tile",
 		desc: "Rudimentary brush - select the individual tile image and paste it onto the terrain.",
@@ -62,9 +66,15 @@ var Brush = (function(){
 		exec: function( tile, options ) {
 
 			var ts = Map.getTilesheet().getTileSetByID( options.selectedSet );
-			Map.setTileImage( tile, ts.getCellWithMask( options.mask ).random() );
 
+			Map.forceMask( tile, 0x1111, ts );
 
+			Map.allNeighbours( tile, function( neighbour ) {
+				if( neighbour ) {
+					neighbour.dataset.tileset = options.selectedSet;
+					Map.chooseTileImage( neighbour );
+				}
+			});
 		}
 	},{
 		name: "Eraser",

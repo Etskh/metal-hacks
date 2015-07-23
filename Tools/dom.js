@@ -1,6 +1,9 @@
 
 
 var DOMUtil = {
+
+	// Use this function to add a class to a dom object
+	//
 	addClass : function( dom, className ) {
 		var classes = dom.className.split(" ");
 		var index = classes.indexOf(className);
@@ -12,6 +15,8 @@ var DOMUtil = {
 		dom.className = classes.join(" ");
 	},
 
+	// This function removes a class from a dom object
+	//
 	removeClass : function( dom, className ) {
 		var classes = dom.className.split(" ");
 		var index = classes.indexOf(className);
