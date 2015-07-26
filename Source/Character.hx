@@ -1,6 +1,70 @@
 package;
 
 
+import openfl.display.Sprite;
+import openfl.display.BitmapData;
+import openfl.geom.Rectangle;
+
+
+
+class CompositeColour
+{
+	public var r:UInt;
+	public var g:UInt;
+	public var b:UInt;
+
+	public function new ( colour:UInt ) {
+		this.r = (colour & 0x00FF0000) >> 16;
+		this.g = (colour & 0x0000FF00) >>  8;
+		this.b = (colour & 0x000000FF) >>  0;
+	}
+
+	public function toUInt () {
+		return (this.r << 16) + (this.g << 8) + this.b;
+	}
+}
+
+
+class Equipment
+{
+	static public function Render( input:BitmapData, skinColour:UInt, mainColour:UInt, detailColour:UInt ) : BitmapData
+	{
+		var pixels:openfl.utils.ByteArray;
+		var allOfIt = new Rectangle(0,0, input.width, input.height );
+
+		input.lock();
+
+		var skin = new CompositeColour( skinColour );
+		var main = new CompositeColour( mainColour );
+		var detail = new CompositeColour( detailColour );
+
+		pixels = input.getPixels(allOfIt);
+		var skinLevel:Float;
+		var mainLevel:Float;
+		var detlLevel:Float;
+
+		for( p in 0...input.width*input.height) {
+
+			// If it's transparent, just skip it
+			if( pixels[p*4+0] == 0 ) {
+				continue;
+			}
+			skinLevel = pixels[p*4+1] / 255.0;
+			mainLevel = pixels[p*4+2] / 255.0;
+			detlLevel = pixels[p*4+3] / 255.0;
+
+			pixels[p*4+0] = pixels[p*4+0]; // alpha
+			pixels[p*4+1] = Std.int( (skinLevel*skin.r) + (mainLevel*main.r) + (detlLevel*detail.r));
+			pixels[p*4+2] = Std.int( (skinLevel*skin.g) + (mainLevel*main.g) + (detlLevel*detail.g));
+			pixels[p*4+3] = Std.int( (skinLevel*skin.b) + (mainLevel*main.b) + (detlLevel*detail.b));
+
+		}
+
+		input.setPixels(allOfIt, pixels);
+		input.unlock();
+		return input;
+	}
+}
 
 
 typedef StatCallback = Float -> Float -> Void;

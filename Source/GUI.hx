@@ -19,117 +19,31 @@ import openfl.geom.Rectangle;
 
 
 
-
-/*
-
-// Does animating, placement, and flow
-//
-typedef WidgetCallback = Dynamic -> Void;
-
-class Widget extends Sprite
-{
-	//public var pos:Point;
-	public var desiredSize:Point;
-	public var hitbox:Sprite;
-	var frame:Sprite;
-	var innerLip:Float;
-	var callbacks:Map <String, Array<WidgetCallback> >;
-
-	public function new () {
-		super();
-
-		this.frame = new Sprite();
-		addChild( frame );
-
-		// Create the event callbacks
-		this.callbacks = new Map <String, Array<WidgetCallback> >();
-
-		// Creating the hitbox
-		this.hitbox = new Sprite();
-		addChild( hitbox );
-		this.hitbox.buttonMode = true;
-		this.hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
-
-		// Resize all the sprites
-		innerLip = 12;
-		this.resize( 64, 64);
-	}
-
-	public function resize( x:Float, y:Float ) {
-		this.desiredSize = new Point(x,y);
-		this.hitbox.graphics.clear();
-		this.hitbox.graphics.beginFill( 0xFF0000, 0.3 );
-		this.hitbox.graphics.drawRect( 0, 0, x, y );
-		this.hitbox.graphics.endFill();
-	}
-
-
-	// TODO: Add a callback to this funciton
-	public function slideTo ( pos:Point, time:Float=0 ) {
-		var callback = false;
-		var tween = Actuate.tween( this, time, { x:pos.x, y:pos.y } ).ease(Bounce.easeOut);
-
-		if( callback ) {
-			tween.onComplete( callback );
-		}
-	}
-
-
-	public function onClick( callback:WidgetCallback ) {
-		Debug.log("GUI","Adding callback to GUI element");
-		addCallback("click", callback );
-	}
-
-	public function addCallback( event:String, callback:WidgetCallback ) {
-		var callbackList = this.callbacks.get(event);
-		if( callbackList == null ) {
-			callbackList = new Array<WidgetCallback>();
-			this.callbacks.set( event, callbackList );
-		}
-		callbackList.push( callback );
-	}
-
-	public function _onClick ( e:Dynamic ) {
-		trace("CLICKED");
-		var callbackList = this.callbacks.get("click");
-		if( callbackList == null ) {
-			return;
-		}
-		for( c in 0...callbackList.length ) {
-			callbackList[c](e);
-		}
-	}
-}
-*/
-
-
-
-interface GUI
-{
-	public function windowFrameID	() : Int ;
-	public function buttonFrameID	() : Int ;
-}
-
-
-
-
 class Skin
 {
-	static var defaultSkin:GUISkin = null;
+	static var defaultSkin:Skin = null;
 	var name:String="default";
 	var tilesheet:Tilesheet = null;
 	var SIZE = 16.0;
 	var frames:Array< Array<Float>>;
+	var basicButtonID:Int;
+	var basicWindowID:Int;
+	var font:Font;
 
-
-	public function new ( assetPath:String, size:Float ) {
-		this.SIZE = size;
-		this.tilesheet = new Tilesheet( Assets.getBitmapData(assetPath));
+	public function new ()
+	{
+		this.SIZE = 16;
+		this.tilesheet = new Tilesheet( Assets.getBitmapData("assets/gui/gui-test.png"));
 		this.frames = new Array<Array<Float>>();
+
+		basicButtonID = addFrame( 0, 0 );
+		basicWindowID = addFrame( 3, 0 );
+		font = new Font();
 
 	}
 
-	public function addFrame ( xIndexTL:Int, yIndexTL:Int ) : Int {
+	public function addFrame ( xIndexTL:Int, yIndexTL:Int ) : Int
+	{
 		var frame:Array<Float> = [
 			// Top-left
 			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
@@ -200,32 +114,8 @@ class Skin
 		tilesheet.drawTiles( graphics, tiles, false );
 	}
 
-	static public function getDefault() {
-		//
-		// no skins have been made
-		//
-		if ( defaultSkin == null ) {
-			defaultSkin = new GUISkin();
-		}
-		return defaultSkin;
-	}
-}
 
 
-class GUISkin extends Skin implements GUI
-{
-	var basicButtonID:Int;
-	var basicWindowID:Int;
-	var font:Font;
-
-	public function new() {
-		super("assets/gui/gui-test.png", 16.0);
-
-		basicButtonID = addFrame( 0, 0 );
-		basicWindowID = addFrame( 3, 0 );
-
-		font = new Font();
-	}
 
 	public function buttonFrameID	() : Int {
 		return basicButtonID;
@@ -236,79 +126,222 @@ class GUISkin extends Skin implements GUI
 	public function getFont() : Font {
 		return font;
 	}
+
+
+	static public function getDefault() {
+		//
+		// no skins have been made
+		//
+		if ( defaultSkin == null ) {
+			defaultSkin = new Skin();
+		}
+		return defaultSkin;
+	}
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef WidgetCallback = Widget -> Void;
+typedef TweenCallback = Void -> Void;
 
 class Widget extends Sprite
 {
-
-}
-
-
-
-class Button extends Widget
-{
-	public var skin:GUISkin;
-	var size:Point;
+	var skin:Skin;
+	var callbacks:Map <String, Array<WidgetCallback> >;
+	public var size:Point;
+	var frameID:Null<Int>;
 	var frameSprite:Sprite;
 	var textSprite:Sprite;
-	var hitbox:Sprite;
+	var textString:String;
+	var textSize:Int;
+	var hitboxSprite:Sprite;
+	var collisionOn:Bool;
+	var containerSprite:Sprite;
 
-	// use swapChildrenAt( default, highlight );
-
-	public function new ( text:String ) {
+	public function new () {
 		super();
 
+		// Create the event callbacks
+		this.callbacks = new Map <String, Array<WidgetCallback> >();
 		this.skin = Skin.getDefault();
-
 		this.size = new Point(128,32);
 
-		this.frameSprite= new Sprite();
-		this.skin.drawFrame( this.skin.buttonFrameID(), size.x, size.y, this.frameSprite.graphics );
-		addChild(this.frameSprite);
+		// Background
+		//
+		this.frameSprite = new Sprite();
+		this.frameID = null;
+		addChild( this.frameSprite );
 
-		this.textSprite = new Sprite();
-		textSprite.y = 6;
-		this.skin.getFont().drawText( text, 16, this.textSprite.graphics, size.x, Font.Centre );
+		// Text
+		//
+		this.textSprite = new Sprite(); // start with empty string
+		textString = "";
 		addChild( this.textSprite );
 
-		this.hitbox = new Sprite();
-		this.hitbox.buttonMode = true;
-		this.hitbox.graphics.clear();
-		this.hitbox.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
-		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
-		this.hitbox.graphics.endFill();
-		this.hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
-		this.hitbox.addEventListener( MouseEvent.MOUSE_OVER, this._onOver );
-		this.hitbox.addEventListener( MouseEvent.MOUSE_OUT, this._onOut );
-		this.hitbox.addEventListener( MouseEvent.MOUSE_DOWN, this._onDown );
-		this.hitbox.addEventListener( MouseEvent.MOUSE_UP, this._onOver );
-		addChild( this.hitbox );
+		// Hitbox
+		//
+		this.hitboxSprite = new Sprite(); // start with no collision
+		collisionOn = false;
+		addChild( this.hitboxSprite );
+
+		// collision
+		//
+		this.containerSprite = new Sprite();
+		addChild( this.containerSprite );
 	}
 
+
+	public function resize ( nsize:Point ) {
+		this.size = nsize;
+		if( this.frameID != null ) {
+			this.frameSprite.graphics.clear();
+			this.skin.drawFrame( this.frameID, size.x, size.y, this.frameSprite.graphics );
+		}
+		if( this.textString != "" ) {
+			this.textSprite.graphics.clear();
+			this.textSprite.y = 6;
+			this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, size.x, Font.Centre );
+		}
+		if( this.collisionOn == true ) {
+			this.hitboxSprite.graphics.clear();
+			this.hitboxSprite.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
+			this.hitboxSprite.graphics.drawRect( 0, 0, size.x, size.y );
+			this.hitboxSprite.graphics.endFill();
+		}
+	}
+
+	public function hitbox () : Sprite {
+		if( this.collisionOn == false ) {
+			this.collisionOn = true;
+			this.hitboxSprite.buttonMode = true;
+			this.hitboxSprite.addEventListener( MouseEvent.CLICK, this._onClick );
+			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_OVER, this._onOver );
+			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_OUT, this._onOut );
+			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_DOWN, this._onDown );
+			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_UP, this._onOver );
+
+			this.hitboxSprite.graphics.clear();
+			this.hitboxSprite.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
+			this.hitboxSprite.graphics.drawRect( 0, 0, size.x, size.y );
+			this.hitboxSprite.graphics.endFill();
+		}
+
+		return this.hitboxSprite;
+	}
+
+	public function setFrameID( id:Int ) {
+		this.frameID = id;
+		this.frameSprite.graphics.clear();
+		this.skin.drawFrame( this.frameID, size.x, size.y, this.frameSprite.graphics );
+	}
+
+	public function setText( text:String, size:Int ) {
+		this.textString = text;
+		this.textSize = size;
+		this.textSprite.graphics.clear();
+		this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, this.size.x, Font.Centre );
+	}
+
+	public function container () : Sprite {
+		return containerSprite;
+	}
+
+	public function add ( child:Sprite ) {
+		container().addChild( child );
+	}
+
+
+
+
+
+
+	// Movement
+	//
+	public function slideTo ( pos:Point, time:Float, callback:TweenCallback ) {
+		var tween = Actuate.tween( this, time, { x:pos.x, y:pos.y } );
+		tween.ease( Bounce.easeOut );
+		tween.onComplete( callback );
+	}
+
+
+
+
+
+
+	//
+	// Callback-wrappers
+	//
+	public function addCallback( event:String, callback:WidgetCallback ) {
+
+		// Thing does stuff? Add a hitbox.
+		hitbox();
+
+		var callbackList = this.callbacks.get(event);
+		if( callbackList == null ) {
+			callbackList = new Array<WidgetCallback>();
+			this.callbacks.set( event, callbackList );
+		}
+		callbackList.push( callback );
+	}
+
+	//
+	// Fires all callbacks registered to an event
+	// returns the number of callbacks attached to the event name
+	//
+	public function fireCallbacks ( eventName:String, widget:Widget ) {
+		var callbackList = this.callbacks.get(eventName);
+		if( callbackList == null ) {
+			return 0;
+		}
+		for( c in 0...callbackList.length ) {
+			callbackList[c](widget);
+		}
+		return callbackList.length;
+	}
+
+
+	//
+	// "Real" events
+	//
+	//
 	public function _onClick ( e:Dynamic ) {
-		// And here is the actual click
+		fireCallbacks( "click", e );
 	}
 	public function _onOver ( e:Dynamic ) {
-		this.hitbox.graphics.clear();
-		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.05 );
-		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
-		this.hitbox.graphics.endFill();
+		if( e.relatedObject != null ) {
+			var widget:Widget = cast e.relatedObject.parent;
+			fireCallbacks( "over", widget);
+		}
 	}
 	public function _onOut ( e:Dynamic ) {
-		this.hitbox.graphics.clear();
-		this.hitbox.graphics.beginFill( 0xFFFFFF, 0.0 );
-		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
-		this.hitbox.graphics.endFill();
+		if( e.relatedObject != null ) {
+			var widget:Widget = cast e.relatedObject.parent;
+			fireCallbacks( "out", widget);
+		}
 	}
 	public function _onDown ( e:Dynamic ) {
-		this.hitbox.graphics.clear();
-		this.hitbox.graphics.beginFill( 0x000000, 0.2 );
-		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
-		this.hitbox.graphics.endFill();
+		if( e.relatedObject != null ) {
+			var widget:Widget = cast e.relatedObject.parent;
+			fireCallbacks( "down", widget);
+		}
 	}
 }
+
+
 
 
 
@@ -504,4 +537,72 @@ class Font {
 		return cursor;
 	}
 
+}
+
+
+
+
+
+
+
+
+class GUI extends Sprite
+{
+	public function new() {
+		super();
+	}
+
+
+	public function createButton( text:String, size:Point, onClick:WidgetCallback ) : Widget
+	{
+		var button:Widget;
+		var skin:Skin = Skin.getDefault();
+
+		button = new Widget();
+
+		button.setText( text, 16 );
+		button.addCallback( "click", onClick );
+		button.addCallback( "over", this._buttonOver );
+		button.addCallback( "out", this._buttonOut );
+		button.addCallback( "down", this._buttonDown );
+		button.setFrameID( skin.buttonFrameID() );
+		button.resize( size );
+
+		return button;
+	}
+
+
+
+	public function _buttonOver ( widget:Widget ) {
+		var hitbox:Sprite = widget.hitbox();
+
+		// later, just set the frameID to overbutton
+
+		hitbox.graphics.clear();
+		hitbox.graphics.beginFill( 0xFFFFFF, 0.05 );
+		hitbox.graphics.drawRect( 0, 0, widget.size.x, widget.size.y );
+		hitbox.graphics.endFill();
+	}
+
+	public function _buttonOut ( widget:Widget ) {
+		var hitbox:Sprite = widget.hitbox();
+
+		// later, just set the frameID to out-button
+
+		hitbox.graphics.clear();
+		hitbox.graphics.beginFill( 0xFFFFFF, 0 );
+		hitbox.graphics.drawRect( 0, 0, widget.size.x, widget.size.y );
+		hitbox.graphics.endFill();
+	}
+
+	public function _buttonDown ( widget:Widget ) {
+		var hitbox:Sprite = widget.hitbox();
+
+		// later, just set the frameID to downbutton
+
+		hitbox.graphics.clear();
+		hitbox.graphics.beginFill( 0x000000, 0.2 );
+		hitbox.graphics.drawRect( 0, 0, widget.size.x, widget.size.y );
+		hitbox.graphics.endFill();
+	}
 }

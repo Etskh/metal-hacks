@@ -27,16 +27,13 @@ interface SimulationState
 
 
 
-class Simulation
+class Simulation extends Sprite
 {
 	// Party characters
 	public var band:Array<Character.BandMember>;
 
-	// Environment
-	public var enviro:World.Environment;
-
-	// Stage
-	public var parent:Sprite;
+	public var world:World.World;
+	public var gui:GUI.GUI;
 
 	// Current state logic
 	var state:SimulationState;
@@ -45,22 +42,20 @@ class Simulation
 
 
 
-	public function new ( parent:Sprite ) {
+	public function new ( ) {
+		super();
 
 		this.band = new Array<Character.BandMember>();
 
-		this.enviro = new World.Environment( parent );
+		this.world = new World.World();
+		addChild(this.world);
 
-		this.parent = parent;
-		parent.addEventListener( MouseEvent.CLICK, _onClick );
+		this.gui = new GUI.GUI();
+		addChild(this.gui);
 
 		this.state = new LoadState(this);
 		this.nextState = null;
 		this.state.init();
-	}
-
-	public function _onClick( e:Dynamic ) {
-		//trace("Simulation recieves events!");
 	}
 
 	public function changeState( state:SimulationState ) {
@@ -108,7 +103,7 @@ class LoadState implements SimulationState
 		var askr = new Character.BandMember("Askr");
 		askr.abilities = new Array<Character.Ability>();
 		askr.abilities.push(Character.Ability.getByName("Groovy Lick"));
-    this.sim.band.push(askr);
+    	this.sim.band.push(askr);
 
 		sim.changeState( new WorldState(this.sim) );
 		return true;
@@ -131,8 +126,9 @@ class LoadState implements SimulationState
 class WorldState implements SimulationState
 {
 	var sim:Simulation;
-	var battleButton:GUI.Button;
+	var battleButton:GUI.Widget;
 	var dude:World.Avatar;
+	var vanity:Sprite;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
@@ -140,13 +136,23 @@ class WorldState implements SimulationState
 
 	public function init () {
 
-		this.battleButton = new GUI.Button("To Battle!");
-		this.sim.parent.addChild( this.battleButton );
+		this.battleButton = sim.gui.createButton("To Battle!", new Point(128,32), onBattleButton );
+		this.sim.gui.addChild( this.battleButton );
 
 		this.dude = new World.Avatar();
 		this.dude.x = 64;
 		this.dude.y = 64;
 		this.sim.parent.addChild( this.dude );
+
+		/*
+		var bitmapData = Assets.getBitmapData("assets/characters/character-rgb-vanity.png").clone();
+		Character.Equipment.Render( bitmapData, 0xe6dbbf, 0x161719, 0xcf3213 );
+		this.vanity = new Sprite();
+		this.vanity.graphics.beginBitmapFill(bitmapData, new openfl.geom.Matrix(), false, true);
+		this.vanity.graphics.drawRect(100, 0, 256-100, bitmapData.height);
+		this.vanity.graphics.endFill();
+		this.sim.parent.addChild(this.vanity);
+		*/
 	}
 
 	public function update () : Bool {
@@ -161,11 +167,14 @@ class WorldState implements SimulationState
 		return "WorldState";
 	}
 
-	public function onBattleButton( e:Dynamic ) {
-		//Debug.log("WorldState","Going to Battle state now!");
-		trace("I bet it works now...");
+	public function onBattleButton( widget:GUI.Widget ) {
+		this.battleButton.slideTo( new Point(-150, 0), 1.0, this.transitionToBattle );
 	}
 
+	public function transitionToBattle() {
+		trace("This was successful");
+		this.sim.changeState( new BattleState(this.sim) );
+	}
 }
 
 
@@ -178,16 +187,10 @@ class BattleState implements SimulationState
 {
 	var sim:Simulation;
 	var crowd:Array<Character.CrowdCharacter>;
-	var stats:Character.StatBlock;
-	var infoScreen:GUI.Widget;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
 		this.crowd = new Array<Character.CrowdCharacter>();
-
-		this.stats = new Character.StatBlock();
-		this.stats.set("crowd-impressed", 0 );
-		this.stats.set("coin-won", 0 );
 	}
 
 	public function init ( )
@@ -215,6 +218,7 @@ class BattleState implements SimulationState
 
 	public function update () : Bool {
 
+		/*
 		var crowdIndex = Std.random( crowd.length );
 		var success = (Math.random()+2) / 3;
 
@@ -224,15 +228,17 @@ class BattleState implements SimulationState
 		//
 		var areAllImpressed = true;
 		for( i in 0...crowd.length ) {
-			if( ! crowd[i].isImpressed() ) {
-				areAllImpressed = false;
+			if( crowd[i] ) {
+				if( ! crowd[i].isImpressed() ) {
+					areAllImpressed = false;
+				}
 			}
 		}
 		if( areAllImpressed ) {
 			Debug.log("State", "Everyone is impressed!");
 			this.sim.changeState( new SpoilsState(this.sim) );
 		}
-
+		*/
 		return true;
 	}
 

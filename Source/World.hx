@@ -48,28 +48,6 @@ class Entity extends Sprite
 
 
 
-class CompositeColour
-{
-	public var r:UInt;
-	public var g:UInt;
-	public var b:UInt;
-
-	public function new ( colour:UInt ) {
-		this.r = (colour & 0x00FF0000) >> 16;
-		this.g = (colour & 0x0000FF00) >>  8;
-		this.b = (colour & 0x000000FF) >>  0;
-
-		trace( this.r );
-		trace( this.g );
-		trace( this.b );
-	}
-
-	public function toUInt () {
-
-	}
-}
-
-
 
 class Avatar extends Entity
 {
@@ -91,55 +69,17 @@ class Avatar extends Entity
 		//this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
 		addChild( hitbox );
 
-		var bitmapData = Assets.getBitmapData("assets/characters/character-rgb-test.png");
+		var bitmapData = Assets.getBitmapData("assets/characters/character-rgb-test.png").clone();
 
 		// EquipmentRender here
 		//
-		this.renderEquipment( bitmapData, 0xe6dbbf, 0x161719, 0xcf3213 );
+		Character.Equipment.Render( bitmapData, 0xe6dbbf, 0x161719, 0xcf3213 );
 		//this.renderEquipment( bitmapData, 0x6d563d, 0x161719, 0xcf3213 );
 
 		this.tilesheet = new Tilesheet( bitmapData );
 		this.tilesheet.addTileRect( new Rectangle( 0, 0, size.x, size.y ));
 		this.tilesheet.drawTiles( this.animation.graphics, [0, 0, 0], true);
 
-	}
-
-	public function renderEquipment( input:BitmapData, skinColour:UInt, mainColour:UInt, detailColour:UInt ) : BitmapData
-	{
-		var pixels:openfl.utils.ByteArray;
-		var allOfIt = new Rectangle(0,0, input.width, input.height );
-
-		input.lock();
-
-		var skin = new CompositeColour( skinColour );
-		var main = new CompositeColour( mainColour );
-		var detail = new CompositeColour( detailColour );
-
-		pixels = input.getPixels(allOfIt);
-		var skinLevel:Float;
-		var mainLevel:Float;
-		var detlLevel:Float;
-
-		for( p in 0...input.width*input.height) {
-
-			// If it's transparent, just skip it
-			if( pixels[p*4+0] == 0 ) {
-				continue;
-			}
-			skinLevel = pixels[p*4+1] / 255.0;
-			mainLevel = pixels[p*4+2] / 255.0;
-			detlLevel = pixels[p*4+3] / 255.0;
-
-			pixels[p*4+0] = pixels[p*4+0]; // alpha
-			pixels[p*4+1] = Std.int( (skinLevel*skin.r) + (mainLevel*main.r) + (detlLevel*detail.r));
-			pixels[p*4+2] = Std.int( (skinLevel*skin.g) + (mainLevel*main.g) + (detlLevel*detail.g));
-			pixels[p*4+3] = Std.int( (skinLevel*skin.b) + (mainLevel*main.b) + (detlLevel*detail.b));
-			
-		}
-
-		input.setPixels(allOfIt, pixels);
-		input.unlock();
-		return input;
 	}
 }
 
@@ -163,17 +103,6 @@ class BandMemberWorldAvatar extends Avatar
 
 
 
-
-
-class World
-{
-
-}
-
-
-
-
-
 class Camera extends Entity
 {
 	public function new () {
@@ -183,13 +112,13 @@ class Camera extends Entity
 
 
 
-class Environment extends Sprite
+class Terrain extends Sprite
 {
 	var tilesheet:Tilesheet;
 	var size:Int;
 	var tiles:Array<Float>;
 
-	public function new ( stage:Sprite ) {
+	public function new () {
 		super();
 
 		var data:openfl.display.BitmapData = Assets.getBitmapData("assets/environment/environment-lobby.png");
@@ -213,7 +142,29 @@ class Environment extends Sprite
 		}
 
 		tilesheet.drawTiles( graphics, levelData, true);
-		stage.addChild( this );
 	}
 
+}
+
+
+class Pathing
+{
+	// empty ... for now
+}
+
+
+
+
+
+class World extends Sprite
+{
+	var terrain:Terrain;
+	var pathing:Pathing;
+
+	public function new() {
+		super();
+
+		this.terrain = new Terrain();
+		addChild( this.terrain );
+	}
 }

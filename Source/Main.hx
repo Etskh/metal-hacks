@@ -31,7 +31,8 @@ import Simulation;
 
 // Will extend Sprite to give a stage to draw on!
 //
-class Main extends Sprite {
+class Main extends Sprite
+{
 
   public function new() {
 		super ();
@@ -42,24 +43,24 @@ class Main extends Sprite {
 		background.graphics.beginFill(0x324599);
 		background.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
 		addChild(background);
-		//background.addEventListener( MouseEvent.CLICK, this._onClick );
 
-  	// Start-up blurb
-  	//
-    var sysName = "Flash";
-    var sysTime = "Unknown";
-    #if !flash
-      sysName = Sys.systemName();
-      sysTime = Std.string( Sys.time() );
-    #end
-  	Debug.log("System", "Week 6 Development Branch - " + sysTime );
-  	Debug.log("System", "debug "+ sysName );
+      	// Start-up blurb
+      	//
+        var sysName = "Flash";
+        var sysTime = "Unknown";
+        #if !flash
+            sysName = Sys.systemName();
+            sysTime = Std.string( Sys.time() );
+        #end
+      	Debug.log("System", "Week 6 Development Branch - " + sysTime );
+      	Debug.log("System", "debug "+ sysName );
 
-    // Add the main simulation object
-    //
-    var simulation = new Simulation( background );
-    addEventListener (Event.ENTER_FRAME, simulation.run );
-  }
+        // Add the main simulation object
+        //
+        var simulation = new Simulation();
+        this.addChild(simulation);
+        addEventListener (Event.ENTER_FRAME, simulation.run );
+    }
 
 	public function _onClick( e:Dynamic ) {
 		Debug.log("System", "Proving it works");
