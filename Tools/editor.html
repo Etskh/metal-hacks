@@ -83,6 +83,7 @@
 			<div id="exporters">
 				<h3>Exporters</h3>
 				<button onclick="window.open().document.write(Map.export());">Export terrain</button>
+				<button onclick="Save.compressString(Map.export());">Gzip terrain</button>
 			</div>
 		</div>
 		<div id="map"></div>
@@ -91,5 +92,6 @@
 		<script type="text/javascript" src="tile.js"></script>
 		<script type="text/javascript" src="map.js"></script>
 		<script type="text/javascript" src="brushes.js"></script>
+		<script type="text/javascript" src="save.js"></script>
 	</body>
 </html>
