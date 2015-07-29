@@ -15,16 +15,9 @@ package ;
 
 
 
-import openfl.display.Sprite; // Main, Simulation
+import openfl.display.Sprite;
 import flash.events.Event;
-import openfl.events.MouseEvent;
 
-
-
-
-
-
-import Simulation;
 
 
 
@@ -39,10 +32,12 @@ class Main extends Sprite
 
 		// Create the background
 		//
-		var background = new Sprite();
+		/*
+        var background = new Sprite();
 		background.graphics.beginFill(0x324599);
 		background.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
 		addChild(background);
+        */
 
       	// Start-up blurb
       	//
@@ -57,12 +52,8 @@ class Main extends Sprite
 
         // Add the main simulation object
         //
-        var simulation = new Simulation();
-        this.addChild(simulation);
-        addEventListener (Event.ENTER_FRAME, simulation.run );
+        var sim = new simulation.Simulation();
+        this.addChild(sim);
+        addEventListener (Event.ENTER_FRAME, sim.run );
     }
-
-	public function _onClick( e:Dynamic ) {
-		Debug.log("System", "Proving it works");
-	}
 }

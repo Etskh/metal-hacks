@@ -30,6 +30,10 @@ class Debug {
 		#end
 	}
 
+	public static function avatar_hitbox_colour	() : UInt { return 0x00FF00; }
+	public static function gui_hitbox_colour	() : UInt { return 0xFF0000; }
+	public static function trigger_hitbox_colour() : UInt { return 0x0000FF; }
+
 	#if debug
 	public static var drawHitboxes = true;
 	#else
