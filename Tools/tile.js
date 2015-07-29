@@ -152,7 +152,7 @@ function TileSheet() {
 		TileSet( 0x1, "Stone", (sheetSize/tileSize), {
 			fills: [ 0x2E, 0x2F ],
 			areas: [ 0x12, 0x15, 0x18 ],
-			stars: [ 0x52 ],
+			stars: [ 0x42 ],
 		})
 	];
 
