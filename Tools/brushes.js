@@ -58,6 +58,7 @@ var Brush = (function(){
 
 		}
 	},{
+		/*
 		name: "Terrain Single",
 		desc: "Sets the single tile and modifies all surrounding tiles",
 		options: {
@@ -77,6 +78,7 @@ var Brush = (function(){
 			});
 		}
 	},{
+		*/
 		name: "Eraser",
 		desc: "Sets any tile it touches to void.",
 		options: {
