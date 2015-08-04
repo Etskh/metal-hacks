@@ -5,28 +5,42 @@ import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
+import openfl.events.MouseEvent;
 
 
 
 class Avatar extends Entity
 {
-	//var tilesheet:Tilesheet;
-	var hitbox:Sprite;
-	var animation:Sprite;
-	var size:Point;
 
-	public function new ( ) {
+	static public function create ( char:character.Character, height:Int )
+	{
+		var avatar:Avatar = new Avatar( char );
+		var slots:Array<character.Slot> = char.getSlots();
+		for( s in 0...slots.length ) {
+			avatar.addLayer( slots[s].getBitmap(), slots[s].getRed(), slots[s].getGreen(), slots[s].getBlue() );
+		}
+
+		return avatar;
+	}
+
+
+
+	public function new ( char:character.Character ) {
 		super();
 
-		this.size = new Point(64,64);
+		_size = new Point(64,64);
 
-		this.animation = new Sprite();
-		addChild( this.animation );
+		_character = char;
 
-		this.hitbox = new Sprite();
-		this.hitbox.graphics.beginFill( Debug.avatar_hitbox_colour() , 0.2 );
-		this.hitbox.graphics.drawRect( 0, 0, size.x, size.y );
-		addChild( this.hitbox );
+		_animation = new Sprite();
+		addChild( _animation );
+
+		_hitbox = new Sprite();
+        _hitbox.buttonMode = true;
+        _hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
+		_hitbox.graphics.beginFill( Debug.avatar_hitbox_colour() , 0.2 );
+		_hitbox.graphics.drawRect( 0, 0, _size.x, _size.y );
+		addChild( _hitbox );
 
 		//var bitmapData = Assets.getBitmapData("assets/characters/character-rgb-test.png").clone();
 		//this.addLayer( bitmapData, 0xe6dbbf, 0x161719, 0xcf3213 );
@@ -47,6 +61,12 @@ class Avatar extends Entity
 		*/
 
 		this.moveTo( pos, distance / speed );
+	}
+
+
+	public function _onClick ( e:Dynamic )
+	{
+		trace("Wat");
 	}
 
 
@@ -86,4 +106,9 @@ class Avatar extends Entity
 		//this.animation.setPixels(allOfIt, pixels);
 		input.unlock();
 	}
+
+	var _hitbox:Sprite;
+	var _animation:Sprite;
+	var _size:Point;
+	var _character:character.Character;
 }
