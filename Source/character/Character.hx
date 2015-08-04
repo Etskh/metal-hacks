@@ -7,6 +7,7 @@ class Character
 	public var level:Int;
 	public var stats:StatBlock;
 	public var abilities:Array<Ability>;
+	public var skinColour:UInt;
 
 	public function new ( name:String ) {
 
@@ -17,7 +18,17 @@ class Character
 		this.abilities = new Array<Ability>();
 
 		this.stats = new StatBlock();
+
+		_slots = new Array<Slot>();
+
+		skinColour = 0xFF0000;
 	}
 
+	public function getSlots() : Array<Slot>
+	{
+		return _slots;
+	}
+
+	var _slots:Array<Slot>;
 
 }
