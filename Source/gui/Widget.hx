@@ -1,16 +1,10 @@
 package gui;
 
 
-
-import openfl.events.MouseEvent;
-
 import openfl.display.Sprite;
 import openfl.geom.Point;
 import motion.easing.Bounce;
 import motion.Actuate;
-import openfl.display.Tilesheet;
-import openfl.Assets;
-import openfl.geom.Rectangle;
 
 
 
@@ -20,9 +14,9 @@ typedef TweenCallback = Void -> Void;
 
 class Widget extends Sprite
 {
-	public var skin:Skin;
-	var callbacks:Map <String, Array<Callback> >;
-	public var size:Point;
+	var _skin:Skin;
+	var _callbacks:Map <String, Array<Callback> >;
+	var _size:Point;
 	var frameID:Null<Int>;
 	var frameSprite:Sprite;
 	var textSprite:Sprite;
@@ -31,15 +25,20 @@ class Widget extends Sprite
 	var hitboxSprite:Sprite;
 	var collisionOn:Bool;
 	var containerSprite:Sprite;
+	//var _isSoft:Bool;
 
-	public function new () {
+	static var s_activeWidget:Null<Widget> = null;
+
+	public function new ( size ) {
 		super();
 
 		// Create the event callbacks
-		this.callbacks = new Map <String, Array<Callback> >();
-		this.skin = Skin.getDefault();
-		this.size = new Point(128,32);
+		_callbacks = new Map <String, Array<Callback> >();
+		_skin = Skin.getDefault();
+		_size = size;
+		//_isSoft = false;
 
+		/*
 		// Background
 		//
 		this.frameSprite = new Sprite();
@@ -62,24 +61,56 @@ class Widget extends Sprite
 		//
 		this.containerSprite = new Sprite();
 		addChild( this.containerSprite );
+		*/
 	}
 
+	public function setActive()
+	{
+		s_activeWidget = this;
+	}
 
+	public function setInactive()
+	{
+		s_activeWidget = null;
+	}
+
+	public function isActive()
+	{
+		return s_activeWidget == this;
+	}
+
+	static public function getActive()
+	{
+		return s_activeWidget;
+	}
+
+	public function getSize () : Point
+	{
+		return _size;
+	}
+
+	public function resize ( newSize:Point )
+	{
+		_size = newSize;
+		fireCallbacks ( "redraw", this );
+	}
+
+	/*
 	public function resize ( nsize:Point ) {
-		this.size = nsize;
+		_size = nsize;
 		if( this.frameID != null ) {
 			this.frameSprite.graphics.clear();
-			this.skin.drawFrame( this.frameID, size.x, size.y, this.frameSprite.graphics );
+			this.skin.drawFrame( this.frameID, _size.x, _size.y, this.frameSprite.graphics );
 		}
 		if( this.textString != "" ) {
 			this.textSprite.graphics.clear();
 			this.textSprite.y = 6;
-			this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, size.x, Font.Centre );
+			this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, _size.x, Font.Centre );
 		}
 		if( this.collisionOn == true ) {
 			this.hitboxSprite.graphics.clear();
 			this.hitboxSprite.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
-			this.hitboxSprite.graphics.drawRect( 0, 0, size.x, size.y );
+			this.hitboxSprite.graphics.drawRect( 0, 0, _size.x, _size.y );
 			this.hitboxSprite.graphics.endFill();
 		}
 	}
@@ -96,7 +127,7 @@ class Widget extends Sprite
 
 			this.hitboxSprite.graphics.clear();
 			this.hitboxSprite.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
-			this.hitboxSprite.graphics.drawRect( 0, 0, size.x, size.y );
+			this.hitboxSprite.graphics.drawRect( 0, 0, _size.x, _size.y );
 			this.hitboxSprite.graphics.endFill();
 		}
 
@@ -106,14 +137,14 @@ class Widget extends Sprite
 	public function setFrameID( id:Int ) {
 		this.frameID = id;
 		this.frameSprite.graphics.clear();
-		this.skin.drawFrame( this.frameID, size.x, size.y, this.frameSprite.graphics );
+		this.skin.drawFrame( this.frameID, _size.x, _size.y, this.frameSprite.graphics );
 	}
 
 	public function setText( text:String, size:Int ) {
 		this.textString = text;
 		this.textSize = size;
 		this.textSprite.graphics.clear();
-		this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, this.size.x, Font.Centre );
+		this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, _size.x, Font.Centre );
 	}
 
 	public function container () : Sprite {
@@ -122,22 +153,31 @@ class Widget extends Sprite
 
 	public function add ( child:Sprite ) {
 		container().addChild( child );
-	}
+	}*/
 
 
 
 
 
-
-	// Movement
+	//
+	// Movement & Visibility
 	//
 	public function slideTo ( pos:Point, time:Float, callback:TweenCallback ) {
 		var tween = Actuate.tween( this, time, { x:pos.x, y:pos.y } );
 		tween.ease( Bounce.easeOut );
 		tween.onComplete( callback );
 	}
-
-
+	//
+	// Fades
+	//
+	public function fadeOut ( time:Float, callback:TweenCallback ) {
+		var tween = Actuate.tween( this, time, { alpha:0 } );
+		tween.onComplete( callback );
+	}
+	public function fadeIn ( time:Float, callback:TweenCallback ) {
+		var tween = Actuate.tween( this, time, { alpha:1 } );
+		tween.onComplete( callback );
+	}
 
 
 
@@ -147,13 +187,10 @@ class Widget extends Sprite
 	//
 	public function addCallback( event:String, callback:Callback ) {
 
-		// Thing does stuff? Add a hitbox.
-		hitbox();
-
-		var callbackList = this.callbacks.get(event);
+		var callbackList = _callbacks.get(event);
 		if( callbackList == null ) {
 			callbackList = new Array<Callback>();
-			this.callbacks.set( event, callbackList );
+			_callbacks.set( event, callbackList );
 		}
 		callbackList.push( callback );
 	}
@@ -163,17 +200,26 @@ class Widget extends Sprite
 	// returns the number of callbacks attached to the event name
 	//
 	public function fireCallbacks ( eventName:String, widget:Widget ) {
-		var callbackList = this.callbacks.get(eventName);
+		var callbackList:Array<Callback> = _callbacks.get(eventName);
 		if( callbackList == null ) {
 			return 0;
 		}
 		for( c in 0...callbackList.length ) {
 			callbackList[c](widget);
 		}
+
+		for( c in 0...this.numChildren) {
+			if( Std.is(this.getChildAt(c), Widget ) ) {
+				cast( this.getChildAt(c), Widget).fireCallbacks( eventName, this );
+			}
+		}
+
 		return callbackList.length;
 	}
 
 
+	/*
+		@TODO : Move into button class
 	//
 	// "Real" events
 	//
@@ -191,9 +237,7 @@ class Widget extends Sprite
 		fireCallbacks( "out", this );
 	}
 	public function _onDown ( e:Dynamic ) {
-		if( e.relatedObject != null ) {
-			var widget:Widget = cast e.relatedObject.parent;
-			fireCallbacks( "down", widget);
-		}
+		fireCallbacks( "down", this );
 	}
+	*/
 }

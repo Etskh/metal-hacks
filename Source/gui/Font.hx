@@ -21,7 +21,7 @@ class Letter {
 	public var charCode:Int;
 	public var breadth:Float;
 
-	public function new ( letter:String, tileID:Int, breadth:Null<Float>=1.0 ) {
+	public function new ( letter:String, tileID:Int, breadth:Null<Float>=0.8 ) {
 		this.charCode = letter.charCodeAt(0);
 		this.tileID = tileID;
 		this.breadth= breadth;
@@ -35,10 +35,10 @@ class Letter {
 
 class Font {
 
-	public static inline var Centre=0;
-	public static inline var Center=0;
-	public static inline var Left=1;
-	public static inline var Right=2;
+	public static inline var CENTRE	= 0;
+	public static inline var CENTER	= 0;
+	public static inline var LEFT	= 1;
+	public static inline var RIGHT	= 2;
 
 	var breadth:Int;
 	var tileSize:Int;
@@ -47,9 +47,9 @@ class Font {
 
 	public function new () {
 
-		var data:openfl.display.BitmapData = Assets.getBitmapData("assets/gui/font-sheet-32.png");
+		var data:openfl.display.BitmapData = Assets.getBitmapData("assets/gui/font-sheet-16.png");
 		this.tilesheet = new Tilesheet(data);
-		this.tileSize = 32;
+		this.tileSize = 16;
 		this.breadth = data.width;
 
 		var cols:Int = cast ( data.width / tileSize );
@@ -150,8 +150,8 @@ class Font {
 
 		// Choose a starting position
 		var cursor:Float = (
-			(align==Font.Left)?
-				0 : ((align==Font.Right) ?
+			(align==Font.LEFT)?
+				0 : ((align==Font.RIGHT) ?
 					width - this.getTextWidth(text,size) :
 					width/2 - this.getTextWidth(text,size)/2
 				)
@@ -175,7 +175,7 @@ class Font {
 			cursor += size * letter.breadth;
 		}
 
-		tilesheet.drawTiles( graphics, drawList, true, Tilesheet.TILE_SCALE);
+		tilesheet.drawTiles( graphics, drawList, false, Tilesheet.TILE_SCALE);
 	}
 
 

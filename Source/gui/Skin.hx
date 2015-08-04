@@ -22,7 +22,7 @@ class Skin
 	static var defaultSkin:Skin = null;
 	var name:String="default";
 	var tilesheet:Tilesheet = null;
-	var SIZE = 16.0;
+	var size:Float;
 	var frames:Array< Array<Float>>;
 	var defaultButtonID:Int;
 	var hoverButtonID:Int;
@@ -33,7 +33,12 @@ class Skin
 	public function new ()
 	{
 		this.size = 16;
-		this.tilesheet = new Tilesheet( Assets.getBitmapData("assets/gui/gui-test.png"));
+		var data = Assets.getBitmapData("assets/gui/gui-test.png");
+		this.tilesheet = new Tilesheet(data);
+
+		var cols:Int = Std.int( data.width / this.size );
+		var rows:Int = Std.int( data.height/ this.size );
+
 
 		for( y in 0...cols) {
 			for( x in 0...rows ) {
@@ -42,101 +47,55 @@ class Skin
 		}
 
 		defaultButtonID = 0x11; //addFrame( 0, 0 );
-		hoverButtonID = 0x11; //addFrame( 3, 3 );
-		activeButtonID = 0x11; //addFrame( 4, 0 );
-		basicWindowID = 0x11; //addFrame( 6, 0 );
+		hoverButtonID = 0x14; //addFrame( 3, 3 );
+		activeButtonID = 0x17; //addFrame( 4, 0 );
+		basicWindowID = 0x1A; //addFrame( 6, 0 );
 
 		font = new Font();
 	}
-
-	/*public function addFrame ( xIndexTL:Int, yIndexTL:Int ) : Int
-	{
-		var frame:Array<Float> = [
-			// Top-left
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
-			// Top-center
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+1)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
-			// Top-right
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+2)*SIZE, (yIndexTL+0)*SIZE, SIZE, SIZE )),
-
-			// Middle-left
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+1)*SIZE, SIZE, SIZE )),
-			// Repeat (Middle-center)
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+1)*SIZE, (yIndexTL+1)*SIZE, SIZE, SIZE )),
-			// Middle-right
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+2)*SIZE, (yIndexTL+1)*SIZE, SIZE, SIZE )),
-
-			// Bottom-left
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+0)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
-			// Bottom-center
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+1)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
-			// Bottom-right
-			tilesheet.addTileRect( new Rectangle( (xIndexTL+2)*SIZE, (yIndexTL+2)*SIZE, SIZE, SIZE )),
-		];
-
-		return this.frames.push( frame );
-	}*/
 
 
 	public function drawFrame( frameID:UInt, w:Float, h:Float, graphics:openfl.display.Graphics ) {
 		var tiles:Array<Float> = new Array<Float>();
 
-		for( x in 0...2 ) {
-			for ( y in 0...2 ) {
-				//tiles.push( frameID );
+		// x, y, tileID, a, b, c, d
+		var tileWidth:Int = Std.int( w / size );
+		var tileHeight:Int= Std.int( h / size );
+		var widthDiff:Int = Std.int( w % size );
+		var heightDiff:Int= Std.int( h % size );
+
+		var tileID = 0;
+		for( x in 0...tileWidth ) {
+			for ( y in 0...tileHeight ) {
+
+				tileID = frameID;
+
+				tiles.push( x*size );
+				tiles.push( y*size );
+
+				if( x == 0 ) {
+					tileID -= 1;
+				}
+				else if( x == tileWidth-1 ) {
+					tileID += 1;
+				}
+
+				if( y == 0 ) {
+					tileID -= 16;
+				}
+				else if( y == tileHeight-1 ) {
+					tileID += 16;
+				}
+
+				tiles.push( tileID );
 			}
 		}
 
 		// Draw them all!
 		graphics.clear();
 		tilesheet.drawTiles( graphics, tiles, false );
+		//tilesheet.drawTiles( graphics, tiles, false, TILE_TRANS_2x2 );
 	}
-
-	/*
-	public function drawFrame( frameID:Int, w:Float, h:Float, graphics:openfl.display.Graphics ) {
-		var tiles = new Array<Float>();
-
-		var cols:Int = Std.int ( w / SIZE );
-		var rows:Int = Std.int ( h / SIZE );
-
-		// Add the four corners
-		tiles = tiles.concat([
-			0,				0,				frames[frameID][0],
-			(cols-1)*SIZE,	0,				frames[frameID][2],
-			0,				(rows-1)*SIZE,	frames[frameID][6],
-			(cols-1)*SIZE,	(rows-1)*SIZE,	frames[frameID][8],
-		]);
-
-
-		// Add the top and bottom
-		for( x in 1...cols-1 ) {
-			tiles = tiles.concat([
-				x*SIZE,		0,				frames[frameID][1],
-				x*SIZE,		(rows-1)*SIZE,	frames[frameID][7]
-			]);
-		}
-
-		// Add the left and right
-		for( y in 1...rows-1 ) {
-			tiles = tiles.concat([
-				0,				y*SIZE,		frames[frameID][3],
-				(cols-1)*SIZE,	y*SIZE,		frames[frameID][5]
-			]);
-		}
-
-		// Add all the centre tiles
-		for( x in 1...cols-1 ) {
-			for( y in 1...rows-1 ) {
-				tiles = tiles.concat([x*SIZE, y*SIZE, frames[frameID][4] ]);
-			}
-		}
-
-		// Draw them all!
-		graphics.clear();
-		tilesheet.drawTiles( graphics, tiles, false );
-	}*/
-
-
 
 
 	public function buttonFrameID	() : Int {

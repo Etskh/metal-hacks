@@ -24,7 +24,7 @@ class GUI extends Sprite
 		super();
 	}
 
-
+	/*
 	public function createButton( text:String, size:Point, onClick:Widget.Callback ) : Widget
 	{
 		var button:Widget;
@@ -46,7 +46,7 @@ class GUI extends Sprite
 	public function createWindow( size:Point ) {
 		var window:Widget = new Widget();
 
-		window.setFrameID( window.skin.buttonFrameID() );
+		window.setFrameID( window.skin.windowFrameID() );
 		window.resize( size );
 
 		return window;
@@ -64,4 +64,5 @@ class GUI extends Sprite
 	public function _buttonDown ( widget:Widget ) {
 		widget.setFrameID( widget.skin.activeButtonFrameID() );
 	}
+	*/
 }
