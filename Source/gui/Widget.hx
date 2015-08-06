@@ -14,54 +14,21 @@ typedef TweenCallback = Void -> Void;
 
 class Widget extends Sprite
 {
-	var _skin:Skin;
-	var _callbacks:Map <String, Array<Callback> >;
-	var _size:Point;
-	var frameID:Null<Int>;
-	var frameSprite:Sprite;
-	var textSprite:Sprite;
-	var textString:String;
-	var textSize:Int;
-	var hitboxSprite:Sprite;
-	var collisionOn:Bool;
-	var containerSprite:Sprite;
-	//var _isSoft:Bool;
 
-	static var s_activeWidget:Null<Widget> = null;
+	static public function getActive()
+	{
+		return s_activeWidget;
+	}
 
-	public function new ( size ) {
+
+	public function new ( size )
+	{
 		super();
 
 		// Create the event callbacks
 		_callbacks = new Map <String, Array<Callback> >();
 		_skin = Skin.getDefault();
 		_size = size;
-		//_isSoft = false;
-
-		/*
-		// Background
-		//
-		this.frameSprite = new Sprite();
-		this.frameID = null;
-		addChild( this.frameSprite );
-
-		// Text
-		//
-		this.textSprite = new Sprite(); // start with empty string
-		textString = "";
-		addChild( this.textSprite );
-
-		// Hitbox
-		//
-		this.hitboxSprite = new Sprite(); // start with no collision
-		collisionOn = false;
-		addChild( this.hitboxSprite );
-
-		// collision
-		//
-		this.containerSprite = new Sprite();
-		addChild( this.containerSprite );
-		*/
 	}
 
 	public function setActive()
@@ -79,11 +46,6 @@ class Widget extends Sprite
 		return s_activeWidget == this;
 	}
 
-	static public function getActive()
-	{
-		return s_activeWidget;
-	}
-
 	public function getSize () : Point
 	{
 		return _size;
@@ -94,66 +56,6 @@ class Widget extends Sprite
 		_size = newSize;
 		fireCallbacks ( "redraw", this );
 	}
-
-	/*
-	public function resize ( nsize:Point ) {
-		_size = nsize;
-		if( this.frameID != null ) {
-			this.frameSprite.graphics.clear();
-			this.skin.drawFrame( this.frameID, _size.x, _size.y, this.frameSprite.graphics );
-		}
-		if( this.textString != "" ) {
-			this.textSprite.graphics.clear();
-			this.textSprite.y = 6;
-			this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, _size.x, Font.Centre );
-		}
-		if( this.collisionOn == true ) {
-			this.hitboxSprite.graphics.clear();
-			this.hitboxSprite.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
-			this.hitboxSprite.graphics.drawRect( 0, 0, _size.x, _size.y );
-			this.hitboxSprite.graphics.endFill();
-		}
-	}
-
-	public function hitbox () : Sprite {
-		if( this.collisionOn == false ) {
-			this.collisionOn = true;
-			this.hitboxSprite.buttonMode = true;
-			this.hitboxSprite.addEventListener( MouseEvent.CLICK, this._onClick );
-			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_OVER, this._onOver );
-			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_OUT, this._onOut );
-			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_DOWN, this._onDown );
-			this.hitboxSprite.addEventListener( MouseEvent.MOUSE_UP, this._onOver );
-
-			this.hitboxSprite.graphics.clear();
-			this.hitboxSprite.graphics.beginFill( 0xFF0000, Debug.drawHitboxes?0.05:0.0 );
-			this.hitboxSprite.graphics.drawRect( 0, 0, _size.x, _size.y );
-			this.hitboxSprite.graphics.endFill();
-		}
-
-		return this.hitboxSprite;
-	}
-
-	public function setFrameID( id:Int ) {
-		this.frameID = id;
-		this.frameSprite.graphics.clear();
-		this.skin.drawFrame( this.frameID, _size.x, _size.y, this.frameSprite.graphics );
-	}
-
-	public function setText( text:String, size:Int ) {
-		this.textString = text;
-		this.textSize = size;
-		this.textSprite.graphics.clear();
-		this.skin.getFont().drawText( textString, textSize, this.textSprite.graphics, _size.x, Font.Centre );
-	}
-
-	public function container () : Sprite {
-		return containerSprite;
-	}
-
-	public function add ( child:Sprite ) {
-		container().addChild( child );
-	}*/
 
 
 
@@ -218,26 +120,9 @@ class Widget extends Sprite
 	}
 
 
-	/*
-		@TODO : Move into button class
-	//
-	// "Real" events
-	//
-	//
-	public function _onClick ( e:Dynamic ) {
-		fireCallbacks( "click", e );
-	}
-	public function _onOver ( e:Dynamic ) {
-		if( e.relatedObject != null ) {
-			var widget:Widget = cast e.relatedObject.parent;
-			fireCallbacks( "over", widget);
-		}
-	}
-	public function _onOut ( e:Dynamic ) {
-		fireCallbacks( "out", this );
-	}
-	public function _onDown ( e:Dynamic ) {
-		fireCallbacks( "down", this );
-	}
-	*/
+	static var s_activeWidget:Null<Widget> = null;
+
+	var _skin:Skin;
+	var _callbacks:Map <String, Array<Callback> >;
+	var _size:Point;
 }

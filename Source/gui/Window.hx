@@ -16,6 +16,7 @@ class Window extends Widget
         // Add the frame
         //
         _frame = new Sprite();
+        _frame.mouseEnabled = false;
         addChild( _frame );
 
         addCallback("redraw", this._redraw );

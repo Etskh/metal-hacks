@@ -10,15 +10,20 @@ class Label extends Widget
     {
         super(size);
 
+        this.mouseEnabled = false;
+
         _text = text;
         _textSize = textSize;
         _font = font;
         _align = Font.LEFT;
 
         _textSprite = new Sprite();
+        _textSprite.mouseEnabled = false;
         addChild( _textSprite );
 
         addCallback("redraw", this._redraw );
+
+        fireCallbacks("redraw", this );
     }
 
     public function setFont ( font:gui.Font )
@@ -44,6 +49,7 @@ class Label extends Widget
     {
         _textSprite.graphics.clear();
         _font.drawText( _text, _textSize, _textSprite.graphics, _size.x, _align );
+
     }
 
 

@@ -12,10 +12,14 @@ class Button extends Widget
     {
         super( size );
 
+        this.tabChildren = false;
+
         //
         // Add the frame
         //
         _frame = new Sprite();
+        _frame.buttonMode = false;
+        _frame.mouseEnabled = false;
         addChild( _frame );
 
         //
@@ -88,9 +92,12 @@ class Button extends Widget
     public function _redraw ( widget:Widget )
     {
         _hitbox.graphics.clear();
-        _hitbox.graphics.beginFill( Debug.gui_hitbox_colour(), Debug.drawHitboxes?0.05:0.0 );
+        _hitbox.graphics.beginFill( Debug.gui_hitbox_colour(), Debug.drawHitboxes?0.5:0.0 );
         _hitbox.graphics.drawRect( 0, 0, _size.x, _size.y );
         _hitbox.graphics.endFill();
+
+        //_hitbox.width = _size.x;
+        //_hitbox.height= _size.y;
 
         _skin.drawFrame(
             this.isActive() ?

@@ -5,7 +5,7 @@ package gui;
 
 import openfl.events.MouseEvent;
 
-import openfl.display.Sprite;
+import openfl.display.DisplayObjectContainer;
 import openfl.geom.Point;
 import motion.easing.Bounce;
 import motion.Actuate;
@@ -18,11 +18,15 @@ import openfl.geom.Rectangle;
 
 
 
-class GUI extends Sprite
+class GUI extends DisplayObjectContainer
 {
 	public function new() {
 		super();
+
+		this.mouseEnabled = false;
 	}
+
+	//var _overlay:Sprite;
 
 	/*
 	public function createButton( text:String, size:Point, onClick:Widget.Callback ) : Widget
