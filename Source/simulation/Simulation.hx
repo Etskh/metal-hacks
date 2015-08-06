@@ -27,8 +27,8 @@ class Simulation extends openfl.display.Sprite
 		this.world = new world.World();
 		addChild(this.world);
 
-		this.gui = new gui.GUI();
-		addChild(this.gui);
+		//this.gui = new gui.GUI();
+		//addChild(this.gui);
 
 		this.state = new LoadState(this);
 		this.nextState = null;

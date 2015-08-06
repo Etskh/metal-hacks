@@ -2,7 +2,6 @@ package simulation;
 
 
 
-
 import openfl.geom.Point;
 
 
@@ -10,6 +9,7 @@ class WorldState implements State
 {
 	var sim:Simulation;
 	var leftWindow:gui.Widget;
+	var battleButton:gui.Button;
 	var dude:world.Avatar;
 	//var vanity:Sprite;
 
@@ -22,20 +22,33 @@ class WorldState implements State
 		//
 		// Create the GUI system
 		//
-		this.leftWindow = sim.gui.createWindow( new Point( 150, 300 ));
+		this.leftWindow = new gui.Window( new Point( 150, 300 ));
 
 		// The "To Battle" button
 		//
-		var battleButton = sim.gui.createButton("To Battle!", new Point(128,32), onBattleButton );
-		this.leftWindow.add( battleButton );
+		battleButton = new gui.Button("To Battle!", new Point(128,32), function( widget:gui.Widget ) {
+			this.leftWindow.fadeOut( 1.0, function(){
+				this.sim.changeState( new BattleState(this.sim) );
+			});
+		});
+		battleButton.x = 8;
+		battleButton.y = 8;
+		this.leftWindow.addChild( battleButton );
+		//this.sim.addChild( battleButton );
 
-		this.sim.gui.addChild( this.leftWindow );
+		// The build test
+		//
+		var debugText = new gui.Label("Loading information", 16, new Point(128,32), gui.Skin.getDefault().getFont() );
+		debugText.x = 8;
+		debugText.y = 64;
+		this.leftWindow.addChild( debugText );
+
+		this.sim.addChild( this.leftWindow );
 
 		// Create world avatars
 		//
-		this.dude = new world.Avatar();
-		this.dude.x = 64;
-		this.dude.y = 64;
+		this.dude = world.Avatar.create( this.sim.band[0], 64 );
+		this.dude.moveTo(new Point(128,128), 0);
 		this.sim.world.addChild( this.dude );
 
 		/*
@@ -59,13 +72,5 @@ class WorldState implements State
 
 	public function name () {
 		return "WorldState";
-	}
-
-	public function onBattleButton( widget:gui.Widget ) {
-		this.leftWindow.slideTo( new Point(-150, 0), 1.0, this.transitionToBattle );
-	}
-
-	public function transitionToBattle() {
-		this.sim.changeState( new BattleState(this.sim) );
 	}
 }
