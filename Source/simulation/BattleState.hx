@@ -7,11 +7,13 @@ class BattleState implements State
 {
 	var sim:Simulation;
 	var crowd:Array<character.CrowdCharacter>;
+	var crowdAvatars:Array<world.Avatar>;
 	var dude:world.Avatar;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
 		this.crowd = new Array<character.CrowdCharacter>();
+		this.crowdAvatars = new Array<world.Avatar>();
 	}
 
 	public function init ( )
@@ -27,6 +29,7 @@ class BattleState implements State
 		//
 		crowdAvatar = new world.Avatar( crowdMember, this.sim.crowdAnimSet, 64 );
 		crowdAvatar.moveTo(new openfl.geom.Point(32,128), 0.5);
+		this.crowdAvatars.push( crowdAvatar );
 		this.sim.world.addChild( crowdAvatar );
 
 
@@ -38,6 +41,7 @@ class BattleState implements State
 		//
 		crowdAvatar = new world.Avatar( crowdMember, this.sim.crowdAnimSet, 64 );
 		crowdAvatar.moveTo(new openfl.geom.Point(64,128+32), 0.5);
+		this.crowdAvatars.push( crowdAvatar );
 		this.sim.world.addChild( crowdAvatar );
 
 		crowdMember = new character.CrowdCharacter("Brute");
@@ -90,9 +94,13 @@ class BattleState implements State
 
 	public function exit () {
 		//infoScreen.slideTo( new Point( -1 * infoScreen.desiredSize.x ,0), 2.0 )
+
+		// Remove the band avatars
 		this.sim.world.removeChild( dude );
-		for( c in 0...crowd.length) {
-			this.sim.world.removeChild(crowd[c]);
+
+		// Remove the crowd avatars
+		for( c in 0...crowdAvatars.length) {
+			this.sim.world.removeChild(crowdAvatars[c]);
 		}
 	}
 
