@@ -10,16 +10,20 @@ import openfl.display.Sprite;
 
 class World extends Sprite
 {
-	var terrain:Terrain;
-	var pathing:Pathing;
+	var _terrain:Terrain;
+	var _pathing:Pathing;
+	var _camera:Camera;
 
 	public function new() {
 		super();
 
-		this.terrain = new Terrain();
-		addChild( this.terrain );
+		_camera = new Camera();
+		addChild( _camera );
 
-		this.pathing = new Pathing();
-		addChild(this.pathing);
+		_terrain = new Terrain();
+		_camera.addChild( _terrain );
+
+		_pathing = new Pathing();
+		_camera.addChild( _pathing);
 	}
 }

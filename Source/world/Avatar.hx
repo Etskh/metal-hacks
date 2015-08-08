@@ -3,48 +3,46 @@ package world;
 
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
+import openfl.display.Tilesheet;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.events.MouseEvent;
+import openfl.Assets;
 
-
+typedef AvatarCallback= Null<Avatar->Void>;
 
 class Avatar extends Entity
 {
-
-	static public function create ( char:character.Character, height:Int )
+	public function new (
+		char:character.Character,
+		animSet:util.AnimationSet,
+		height:Int,
+		callback:AvatarCallback=null )
 	{
-		var avatar:Avatar = new Avatar( char );
-		var slots:Array<character.Slot> = char.getSlots();
-		for( s in 0...slots.length ) {
-			avatar.addLayer( slots[s].getBitmap(), slots[s].getRed(), slots[s].getGreen(), slots[s].getBlue() );
-		}
-
-		return avatar;
-	}
-
-
-
-	public function new ( char:character.Character ) {
 		super();
 
 		_size = new Point(64,64);
 
 		_character = char;
 
-		_animation = new Sprite();
+		_animation = new util.AnimationContext(animSet, composeBitmap(char.getSlots()), _size.x );
+		_animation.update();
 		addChild( _animation );
 
 		_hitbox = new Sprite();
         _hitbox.buttonMode = true;
         _hitbox.addEventListener( MouseEvent.CLICK, this._onClick );
 		_hitbox.graphics.beginFill( Debug.avatar_hitbox_colour() , 0.2 );
-		_hitbox.graphics.drawRect( 0, 0, _size.x, _size.y );
+		_hitbox.graphics.drawCircle( _size.x / 2, _size.y / 2, _size.x / 2 );
 		addChild( _hitbox );
 
-		//var bitmapData = Assets.getBitmapData("assets/characters/character-rgb-test.png").clone();
-		//this.addLayer( bitmapData, 0xe6dbbf, 0x161719, 0xcf3213 );
+		_callback = callback;
+	}
 
+
+	public function getCharacter()
+	{
+		return _character;
 	}
 
 
@@ -66,49 +64,59 @@ class Avatar extends Entity
 
 	public function _onClick ( e:Dynamic )
 	{
-		trace("Wat");
+		if( _callback != null ) {
+			_callback( this );
+		}
 	}
 
 
-	public function addLayer( input:BitmapData, skinColour:UInt, mainColour:UInt, detailColour:UInt )
+	public function composeBitmap ( slots:Array<character.Slot> ) : BitmapData
 	{
+		/* TODO: Make sure all incoming slot's bitmap datas are the same size */
+
+		// Make a fillmap the same size as the first bitmap
+		var fillMap:BitmapData = new BitmapData(slots[0].getBitmap().width, slots[0].getBitmap().height, true, 0x000000 );
+		var allOfIt = new Rectangle(0,0, fillMap.width, fillMap.height );
 		var pixels:openfl.utils.ByteArray;
-		var allOfIt = new Rectangle(0,0, input.width, input.height );
 
-		input.lock();
+		for( s in 0...slots.length ) {
+			var skin = new util.CompositeColour( slots[s].getRed() );
+			var main = new util.CompositeColour( slots[s].getGreen() );
+			var detail = new util.CompositeColour( slots[s].getBlue() );
 
-		var skin = new util.CompositeColour( skinColour );
-		var main = new util.CompositeColour( mainColour );
-		var detail = new util.CompositeColour( detailColour );
+			pixels = slots[s].getBitmap().getPixels(allOfIt);
+			var skinLevel:Float;
+			var mainLevel:Float;
+			var detlLevel:Float;
 
-		pixels = input.getPixels(allOfIt);
-		var skinLevel:Float;
-		var mainLevel:Float;
-		var detlLevel:Float;
+			for( p in 0...fillMap.width*fillMap.height) {
 
-		for( p in 0...input.width*input.height) {
+				// If it's transparent, just skip it
+				if( pixels[p*4+0] == 0 ) {
+					continue;
+				}
+				skinLevel = pixels[p*4+1] / 255.0;
+				mainLevel = pixels[p*4+2] / 255.0;
+				detlLevel = pixels[p*4+3] / 255.0;
 
-			// If it's transparent, just skip it
-			if( pixels[p*4+0] == 0 ) {
-				continue;
+				pixels[p*4+0] = pixels[p*4+0]; // alpha
+				pixels[p*4+1] = Std.int( (skinLevel*skin.r) + (mainLevel*main.r) + (detlLevel*detail.r));
+				pixels[p*4+2] = Std.int( (skinLevel*skin.g) + (mainLevel*main.g) + (detlLevel*detail.g));
+				pixels[p*4+3] = Std.int( (skinLevel*skin.b) + (mainLevel*main.b) + (detlLevel*detail.b));
+
 			}
-			skinLevel = pixels[p*4+1] / 255.0;
-			mainLevel = pixels[p*4+2] / 255.0;
-			detlLevel = pixels[p*4+3] / 255.0;
 
-			pixels[p*4+0] = pixels[p*4+0]; // alpha
-			pixels[p*4+1] = Std.int( (skinLevel*skin.r) + (mainLevel*main.r) + (detlLevel*detail.r));
-			pixels[p*4+2] = Std.int( (skinLevel*skin.g) + (mainLevel*main.g) + (detlLevel*detail.g));
-			pixels[p*4+3] = Std.int( (skinLevel*skin.b) + (mainLevel*main.b) + (detlLevel*detail.b));
-
+			fillMap.setPixels( allOfIt, pixels );
 		}
 
-		//this.animation.setPixels(allOfIt, pixels);
-		input.unlock();
+		return fillMap;
 	}
 
+
 	var _hitbox:Sprite;
-	var _animation:Sprite;
+	var _animation:util.AnimationContext;
 	var _size:Point;
 	var _character:character.Character;
+	var _callback:AvatarCallback;
+	var _tilesheet:Tilesheet;
 }
