@@ -6,6 +6,7 @@ class Ability
 	public var name:String;
 	public var desc:String;
 	public var cost:Int;
+	public var iconPath:String;
 	//var iconBitmap:BitmapData;
 	var effects:Array<AbilityEffect>;
 	static var abilities:Array<Ability>;
@@ -81,14 +82,34 @@ class Ability
 		// MAYBETODO: Load them in from a file? Maybe?
 
 		ability = new Ability("Dive-Bomb");
+		ability.iconPath = "assets/character/abiltities/divebomb.jpg";
 		ability.desc = "Impresses one target for up to 150% of your {effect-0-stat} ({effect-0-max})";
 		ability.effects.push( new character.effects.Impress( 1.5, "charisma" ));
 		abilities.push( ability );
 
-		ability = new Ability("Spotlight");
+		ability = new Ability("Beckon");
+		ability.iconPath = "assets/character/abiltities/beckon.jpg";
+		ability.desc = "Impresses one target for up to 150% of your {effect-0-stat} ({effect-0-max})";
+		ability.effects.push( new character.effects.Impress( 1.5, "charisma" ));
+		abilities.push( ability );
+
+		ability = new Ability("Face-Melter");
+		ability.iconPath = "assets/character/abiltities/facemelter.jpg";
+		ability.desc = "Impresses one target for up to 150% of your {effect-0-stat} ({effect-0-max})";
+		ability.effects.push( new character.effects.Impress( 1.8, "technique" ));
+		abilities.push( ability );
+
+		ability = new Ability("Lightening Storm");
+		ability.iconPath = "assets/character/abiltities/lightening.jpg";
+		ability.desc = "Impresses one target for up to 150% of your {effect-0-stat} ({effect-0-max})";
+		ability.effects.push( new character.effects.Impress( 1.5, "charisma" ));
+		abilities.push( ability );
+
+		/*ability = new Ability("Spotlight");
+		ability.iconPath = "assets/character/abiltities/spotlight.jpg";
 		ability.desc = "Grants this band-member {effect-0-max}% more {effect-0-stat} for {effect-0-duration} bars (scales with level)";
 		ability.effects.push( new character.effects.BuffScaled( "spotlight", 0.1, "charisma", 4 ));
-		abilities.push( ability );
+		abilities.push( ability );*/
 	}
 
 	static public function getByName( name:String ) : Null<Ability> {
