@@ -12,6 +12,14 @@ class CrowdCharacter extends Character
 		this.stats.set("impress-max", 50.0 );
 
 		this.stats.addTrigger("impress", onImpress );
+
+
+		var slot:Slot = null;
+		
+		slot = new Slot("debug", "assets/characters/creature-rgb-test.png");
+		slot.setColours( 0xee2211, 0x161719, 0xcf3213 );
+		_slots.push( slot );
+
 	}
 
 	public function onImpress( newVal:Float, oldVal:Float ) {

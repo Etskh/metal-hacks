@@ -6,7 +6,6 @@ class BandMember extends Character
 	public function new ( name:String ) {
 		super(name);
 
-		var slot:Slot = null;
 		//
 		// Stats!
 		//
@@ -20,16 +19,15 @@ class BandMember extends Character
 
 		this.skinColour = 0xe6dbbf;
 
-		// Add the debug layer
-		slot = new Slot("debug", "assets/characters/character-rgb-test.png");
-		slot.setColours( this.skinColour, 0x161719, 0xcf3213 );
-
 		// For every loaded equipment item
 		//
-		//slot = new Slot("torso", "assets/characters/equipment/pauldrons.png");
-		//slot.setColours( this.skinColour, 0x161719, 0xcf3213 );
-
+		var slot:Slot = null;
+		
+		slot = new Slot("debug", "assets/characters/character-rgb-test.png");
+		slot.setColours( this.skinColour, 0x161719, 0xcf3213 );
 		_slots.push( slot );
+
+
 	}
 
 
