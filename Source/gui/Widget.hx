@@ -81,6 +81,14 @@ class Widget extends Sprite
 		tween.onComplete( callback );
 	}
 
+	public function hide ( ) {
+		Actuate.apply ( this, { alpha: 0 });
+	}
+
+	public function show () {
+		Actuate.apply ( this, { alpha: 1 });
+	}
+
 
 
 
