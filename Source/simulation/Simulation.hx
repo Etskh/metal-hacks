@@ -9,8 +9,13 @@ class Simulation extends openfl.display.Sprite
 	// Party characters
 	public var band:Array<character.BandMember>;
 
+	// Global objects
 	public var world:world.World;
 	public var gui:gui.GUI;
+
+	// Animation sets
+	public var bandAnimSet:util.AnimationSet;
+	public var crowdAnimSet:util.AnimationSet;
 
 	// Current state logic
 	var state:State;
@@ -29,6 +34,10 @@ class Simulation extends openfl.display.Sprite
 
 		//this.gui = new gui.GUI();
 		//addChild(this.gui);
+
+		// Start the animations
+		bandAnimSet= new util.AnimationSet("band");
+		crowdAnimSet = new util.AnimationSet("crowd");
 
 		this.state = new LoadState(this);
 		this.nextState = null;

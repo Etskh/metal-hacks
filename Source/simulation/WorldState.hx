@@ -23,33 +23,40 @@ class WorldState implements State
 		// Create the GUI system
 		//
 		this.leftWindow = new gui.Window( new Point( 150, 300 ));
+		this.leftWindow.fadeIn( 1.0, function(){} );
 
 		// The "To Battle" button
 		//
 		battleButton = new gui.Button("To Battle!", new Point(128,32), function( widget:gui.Widget ) {
-			this.leftWindow.fadeOut( 1.0, function(){
+			this.leftWindow.fadeOut( 0.5, function(){
 				this.sim.changeState( new BattleState(this.sim) );
+				this.sim.removeChild( this.leftWindow );
 			});
 		});
 		battleButton.x = 8;
 		battleButton.y = 8;
 		this.leftWindow.addChild( battleButton );
-		//this.sim.addChild( battleButton );
 
 		// The build test
 		//
-		var debugText = new gui.Label("Loading information", 16, new Point(128,32), gui.Skin.getDefault().getFont() );
-		debugText.x = 8;
-		debugText.y = 64;
-		this.leftWindow.addChild( debugText );
+		var debugText = Sys.systemName();
+		var debugLabel = new gui.Label(debugText, 16, new Point(128,32), gui.Skin.getDefault().getFont() );
+		debugLabel.x = 8;
+		debugLabel.y = 64;
+		this.leftWindow.addChild( debugLabel );
 
 		this.sim.addChild( this.leftWindow );
 
+
+
+
+
 		// Create world avatars
 		//
-		this.dude = world.Avatar.create( this.sim.band[0], 64 );
-		this.dude.moveTo(new Point(128,128), 0);
+		/*this.dude = new world.Avatar( this.sim.band[0], this.sim.bandAnimSet, 64 );
+		this.dude.moveTo(new Point(128,32), 0.5);
 		this.sim.world.addChild( this.dude );
+		*/
 
 		/*
 		var bitmapData = Assets.getBitmapData("assets/characters/character-rgb-vanity.png").clone();
