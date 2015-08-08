@@ -82,10 +82,11 @@ class BattleState implements State
 			this.sim.changeState( new WorldState(this.sim) );
 		}
 		else {
-			var crowdIndex = Std.random( crowd.length );
-			var success = (Math.random()+2) / 3;
+			//
+			//var crowdIndex = Std.random( crowd.length );
+			//var success = (Math.random()+2) / 3;
 
-			sim.band[0].abilities[0].exec( success, sim.band[0], [crowd[crowdIndex]]);
+			//sim.band[0].abilities[0].exec( success, sim.band[0], [crowd[crowdIndex]]);
 
 		}
 
@@ -93,7 +94,6 @@ class BattleState implements State
 	}
 
 	public function exit () {
-		//infoScreen.slideTo( new Point( -1 * infoScreen.desiredSize.x ,0), 2.0 )
 
 		// Remove the band avatars
 		this.sim.world.removeChild( dude );
