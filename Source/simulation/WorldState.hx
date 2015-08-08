@@ -23,7 +23,8 @@ class WorldState implements State
 		// Create the GUI system
 		//
 		this.leftWindow = new gui.Window( new Point( 150, 300 ));
-		this.leftWindow.fadeIn( 1.0, function(){} );
+		this.leftWindow.hide();
+		this.leftWindow.fadeIn( 2.0, function(){} );
 
 		// The "To Battle" button
 		//
