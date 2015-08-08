@@ -146,6 +146,11 @@ class Font {
 
 
 	public function drawText ( text:String, size:Float, graphics:openfl.display.Graphics, width:Float, align:Int ) {
+
+		/* TODO Add in new-line functionality */
+		
+
+
 		var drawList:Array<Float> = new Array<Float>();
 
 		// Choose a starting position
@@ -156,9 +161,12 @@ class Font {
 					width/2 - this.getTextWidth(text,size)/2
 				)
 			);
+		var lineY:Float=0;
 
 		for( c in 0...text.length ) {
-			var letter:Letter = this.letters.get( text.charCodeAt(c) );
+
+			var charCode = text.charCodeAt(c);
+			var letter:Letter = this.letters.get( charCode );
 			if( letter == null ) {
 				trace("ERROR: Could not find code for `"+text.charAt(c)+"` character.");
 				continue;
@@ -168,7 +176,7 @@ class Font {
 
 			// Add to the draw list
 			drawList.push( cursor - margin );	// x-coord
-			drawList.push( 0 );				// y-coord
+			drawList.push( lineY );				// y-coord
 			drawList.push( letter.tileID );
 			drawList.push( size / this.tileSize );				// scale
 
