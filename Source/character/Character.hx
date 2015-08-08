@@ -1,6 +1,11 @@
 package character;
 
-
+/**
+ *
+ * Character contains all the gameplay-only elements of an entity.
+ * this includes stats, and lists of abilties
+ *
+ */
 class Character
 {
 	public var name:String;
@@ -21,7 +26,19 @@ class Character
 
 		_slots = new Array<Slot>();
 
-		skinColour = 0xFF0000;
+		skinColour = 0xe6dbbf;
+	}
+
+	public function addDebugSlot( assetPath:String, main:UInt, detail:UInt )
+	{
+		// Create the new slot with name "debug"
+		var debugSlot:Slot = new Slot("debug", assetPath );
+
+		// Set the colours
+		debugSlot.setColours( this.skinColour, main, detail );
+
+		//  Finally, add it to the array
+		_slots.push( debugSlot );
 	}
 
 	public function getSlots() : Array<Slot>

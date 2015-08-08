@@ -41,12 +41,9 @@ class Main extends Sprite
 
       	// Start-up blurb
       	//
-        var sysName = "Flash";
-        var sysTime = "Unknown";
-        #if !flash
-            sysName = Sys.systemName();
-            sysTime = Std.string( Sys.time() );
-        #end
+        var sysName = Sys.systemName();
+        var sysTime = Std.string( Sys.time() );
+
       	Debug.log("System", "Week 6 Development Branch - " + sysTime );
       	Debug.log("System", "debug "+ sysName );
 

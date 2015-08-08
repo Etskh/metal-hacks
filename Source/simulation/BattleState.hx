@@ -7,6 +7,7 @@ class BattleState implements State
 {
 	var sim:Simulation;
 	var crowd:Array<character.CrowdCharacter>;
+	var dude:world.Avatar;
 
 	public function new (sim:Simulation) {
 		this.sim = sim;
@@ -45,7 +46,6 @@ class BattleState implements State
 
 
 
-		var dude:world.Avatar;
 		dude = new world.Avatar( this.sim.band[0], this.sim.bandAnimSet, 64, function( avatar:world.Avatar){
 			trace( avatar.getCharacter().name );
 		});
@@ -89,7 +89,11 @@ class BattleState implements State
 	}
 
 	public function exit () {
-		//infoScreen.slideTo( new Point( -1 * infoScreen.desiredSize.x ,0), 2.0 );
+		//infoScreen.slideTo( new Point( -1 * infoScreen.desiredSize.x ,0), 2.0 )
+		this.sim.world.removeChild( dude );
+		for( c in 0...crowd.length) {
+			this.sim.world.removeChild(crowd[c]);
+		}
 	}
 
 	public function name () {
